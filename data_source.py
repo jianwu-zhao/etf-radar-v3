@@ -19,6 +19,7 @@ except ImportError:
 
 
 def _request(url, timeout=15, retries=3):
+    import random, time
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     for i in range(retries):
         try:
@@ -27,8 +28,7 @@ def _request(url, timeout=15, retries=3):
         except Exception:
             if i == retries - 1:
                 raise
-            import time
-            time.sleep(1 + i)
+            time.sleep(2 + i * 2 + random.random())
     return None
 
 
@@ -130,19 +130,34 @@ def daily_kline(code, limit=500):
     return out
 
 
-def fetch_etf_list():
+def fetch_etf_list(min_amount=10000000):
+    """获取 ETF 列表，按成交额过滤"""
     if AKSHARE_AVAILABLE:
         try:
             df = ak.fund_etf_spot_em()
-            return [{"code": row["代码"], "name": row["名称"]} for _, row in df.iterrows()]
+            out = []
+            for _, row in df.iterrows():
+                amt = float(row.get("成交额", 0) or 0)
+                if amt >= min_amount:
+                    out.append({"code": row["代码"], "name": row["名称"], "amount": amt})
+            return out
         except:
             pass
     url = ("http://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5000&po=1&np=1"
-           "&fltt=2&invt=2&fid=f3&fs=b:MK0021,b:MK0022,b:MK0023,b:MK0024"
-           "&fields=f12,f14")
+           "&fltt=2&invt=2&fid=f6&fs=b:MK0021,b:MK0022,b:MK0023,b:MK0024"
+           "&fields=f12,f14,f5,f6,f3")
     data = _request(url)
     rows = data.get("data", {}).get("diff", [])
-    return [{"code": r.get("f12"), "name": r.get("f14")} for r in rows if r.get("f12")]
+    out = []
+    for r in rows:
+        amt = r.get("f6") or 0
+        try:
+            amt = float(amt)
+        except:
+            amt = 0
+        if amt >= min_amount:
+            out.append({"code": r.get("f12"), "name": r.get("f14"), "amount": amt, "volume": r.get("f5", 0)})
+    return out
 
 
 if __name__ == "__main__":

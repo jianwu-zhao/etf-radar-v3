@@ -9,7 +9,8 @@ import math
 import argparse
 from collections import defaultdict
 
-from data_source import daily_kline, fetch_etf_list
+from data_source import daily_kline
+from etf_universe import EXPANDED_ETF
 from tech_indicators import analyze
 
 CORE_ETF = [
@@ -266,7 +267,7 @@ def select_portfolio(day_idx, history_map, base_k, target_pos, top_n=6):
     return selected
 
 
-def run_backtest(codes=CORE_ETF, top_n=6, fee=0.0005):
+def run_backtest(codes=EXPANDED_ETF, top_n=6, fee=0.0005):
     import time
     print("加载历史数据...")
     t0 = time.time()

@@ -16,7 +16,8 @@ import argparse
 import datetime
 from typing import List, Dict, Any
 
-from data_source import realtime_quote, daily_kline
+from data_source import realtime_quote, daily_kline, fetch_etf_list
+from etf_universe import EXPANDED_ETF
 from tech_indicators import analyze
 from datetime import timezone, timedelta
 
@@ -406,7 +407,7 @@ def main():
     ap.add_argument("--no-save", action="store_true")
     args = ap.parse_args()
 
-    codes = args.codes.split(",") if args.codes else CORE_ETF
+    codes = args.codes.split(",") if args.codes else EXPANDED_ETF
 
     log("开始获取大盘状态...")
     market_regime, auto_pos = detect_market_regime()
