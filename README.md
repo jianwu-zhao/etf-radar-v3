@@ -233,3 +233,20 @@ freki/
 ## License
 
 Private. Not for redistribution.
+
+## GitHub Actions 自动运行
+
+已配置 `.github/workflows/daily.yml`：
+- **触发时间**：工作日北京时间 15:30
+- **功能**：自动运行 V3 策略、保存报告、推送 Telegram
+- **仓库**：https://github.com/jianwu-zhao/etf-radar-v3
+
+### 需要配置的 Secrets
+
+在仓库 Settings → Secrets and variables → Actions 添加：
+
+| Secret | 值 |
+|--------|-----|
+| `TG_BOT_TOKEN` | 你的 Telegram Bot Token |
+| `TG_CHAT_ID` | 7836870080 |
+
