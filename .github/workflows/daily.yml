@@ -30,7 +30,7 @@ jobs:
           python-version: '3.11'
 
       - name: Run ETF Radar V3
-        run: python3 radar_strategy_v3_1.py --no-save
+        run: python3 radar_strategy_v3_1.py
 
       - name: Generate dashboard
         run: python3 generate_dashboard.py
