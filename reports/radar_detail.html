@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ETF 波段雷达 V2</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#0f172a;color:#e2e8f0}
+.wrap{max-width:1800px;margin:0 auto;padding:20px}
+h1{font-size:22px;color:#fff;letter-spacing:.5px}
+.sub{color:#cbd5e1;font-size:13px;line-height:1.8;margin-top:8px}
+table{width:100%;border-collapse:collapse;margin-top:16px}
+th{background:#1e293b;color:#94a3b8;font-size:11px;text-align:left;padding:10px 8px;border-bottom:1px solid #334155;white-space:nowrap}
+td{padding:10px 8px;border-bottom:1px solid #1e293b;font-size:12px}
+tr:hover{background:#1e293b}
+.rank{color:#94a3b8;font-family:monospace;font-size:11px}
+.an{font-weight:800;font-size:13px;color:#e2e8f0}
+.ac{color:#64748b;font-family:monospace;font-size:10px;margin-top:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>ETF 波段雷达 V2</h1>
+<div class="sub">更新: {now} | 共 {len(uniq)} 个</div>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>标的</th>
+<th>代码</th>
+<th>价格</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>1</td><td class='an'>酒ETF</td><td class='ac'>512690</td><td>+46.1</td></tr>
+<tr><td>2</td><td class='an'>传媒ETF</td><td class='ac'>512980</td><td>+42.3</td></tr>
+<tr><td>3</td><td class='an'>中概互联ETF</td><td class='ac'>513050</td><td>+37.3</td></tr>
+<tr><td>4</td><td class='an'>有色期货ETF</td><td class='ac'>159980</td><td>+37.1</td></tr>
+<tr><td>5</td><td class='an'>黄金ETF</td><td class='ac'>518880</td><td>+36.8</td></tr>
+<tr><td>6</td><td class='an'>上海金ETF</td><td class='ac'>518600</td><td>+36.8</td></tr>
+<tr><td>7</td><td class='an'>电力ETF</td><td class='ac'>159611</td><td>+35.8</td></tr>
+<tr><td>8</td><td class='an'>食品饮料ETF</td><td class='ac'>515710</td><td>+35.3</td></tr>
+<tr><td>9</td><td class='an'>家电ETF</td><td class='ac'>159996</td><td>+35.3</td></tr>
+<tr><td>10</td><td class='an'>农业ETF</td><td class='ac'>159825</td><td>+35.3</td></tr>
+<tr><td>11</td><td class='an'>日经ETF</td><td class='ac'>513220</td><td>+35.3</td></tr>
+<tr><td>12</td><td class='an'>德国ETF</td><td class='ac'>159561</td><td>+33.5</td></tr>
+<tr><td>13</td><td class='an'>船舶ETF</td><td class='ac'>560710</td><td>+33.5</td></tr>
+<tr><td>14</td><td class='an'>能源ETF</td><td class='ac'>159930</td><td>+33.0</td></tr>
+<tr><td>15</td><td class='an'>恒生科技ETF</td><td class='ac'>513180</td><td>+32.8</td></tr>
+<tr><td>16</td><td class='an'>机床ETF</td><td class='ac'>159667</td><td>+32.0</td></tr>
+<tr><td>17</td><td class='an'>可转债ETF</td><td class='ac'>511380</td><td>+32.0</td></tr>
+<tr><td>18</td><td class='an'>标普500ETF</td><td class='ac'>513500</td><td>+31.6</td></tr>
+<tr><td>19</td><td class='an'>自由现金流ETF</td><td class='ac'>159201</td><td>+31.2</td></tr>
+<tr><td>20</td><td class='an'>云计算ETF</td><td class='ac'>516310</td><td>+31.0</td></tr>
+<tr><td>21</td><td class='an'>煤炭ETF</td><td class='ac'>515220</td><td>+31.0</td></tr>
+<tr><td>22</td><td class='an'>新能源车ETF</td><td class='ac'>515030</td><td>+29.8</td></tr>
+<tr><td>23</td><td class='an'>中证2000ETF</td><td class='ac'>563200</td><td>+28.2</td></tr>
+<tr><td>24</td><td class='an'>国债ETF</td><td class='ac'>511010</td><td>+27.3</td></tr>
+<tr><td>25</td><td class='an'>10年国债ETF</td><td class='ac'>511260</td><td>+27.3</td></tr>
+<tr><td>26</td><td class='an'>基建ETF</td><td class='ac'>516950</td><td>+26.8</td></tr>
+<tr><td>27</td><td class='an'>旅游ETF</td><td class='ac'>159766</td><td>+26.5</td></tr>
+<tr><td>28</td><td class='an'>纳指ETF</td><td class='ac'>513100</td><td>+26.0</td></tr>
+<tr><td>29</td><td class='an'>豆粕ETF</td><td class='ac'>159985</td><td>+24.7</td></tr>
+<tr><td>30</td><td class='an'>电池ETF</td><td class='ac'>159755</td><td>+24.4</td></tr>
+<tr><td>31</td><td class='an'>机器人ETF</td><td class='ac'>562500</td><td>+24.0</td></tr>
+<tr><td>32</td><td class='an'>红利ETF</td><td class='ac'>510880</td><td>+24.0</td></tr>
+<tr><td>33</td><td class='an'>钢铁ETF</td><td class='ac'>515210</td><td>+23.6</td></tr>
+<tr><td>34</td><td class='an'>工程机械ETF</td><td class='ac'>560280</td><td>+23.6</td></tr>
+<tr><td>35</td><td class='an'>有色金属ETF</td><td class='ac'>512400</td><td>+22.8</td></tr>
+<tr><td>36</td><td class='an'>游戏ETF</td><td class='ac'>159869</td><td>+20.2</td></tr>
+<tr><td>37</td><td class='an'>银行ETF</td><td class='ac'>512800</td><td>+20.2</td></tr>
+<tr><td>38</td><td class='an'>粮食ETF</td><td class='ac'>159698</td><td>+20.2</td></tr>
+<tr><td>39</td><td class='an'>沪深300ETF</td><td class='ac'>510300</td><td>+19.2</td></tr>
+<tr><td>40</td><td class='an'>证券ETF</td><td class='ac'>512880</td><td>+19.2</td></tr>
+<tr><td>41</td><td class='an'>光伏ETF</td><td class='ac'>515790</td><td>+18.4</td></tr>
+<tr><td>42</td><td class='an'>军工ETF</td><td class='ac'>512660</td><td>+18.4</td></tr>
+<tr><td>43</td><td class='an'>成长100ETF</td><td class='ac'>159259</td><td>+17.7</td></tr>
+<tr><td>44</td><td class='an'>新能源电池ETF</td><td class='ac'>159566</td><td>+16.2</td></tr>
+<tr><td>45</td><td class='an'>香港证券ETF</td><td class='ac'>513090</td><td>+15.5</td></tr>
+<tr><td>46</td><td class='an'>化工ETF</td><td class='ac'>159870</td><td>+15.0</td></tr>
+<tr><td>47</td><td class='an'>恒生医疗ETF</td><td class='ac'>513060</td><td>+14.2</td></tr>
+<tr><td>48</td><td class='an'>稀土ETF</td><td class='ac'>516150</td><td>+12.0</td></tr>
+<tr><td>49</td><td class='an'>电网设备ETF</td><td class='ac'>159326</td><td>+11.0</td></tr>
+<tr><td>50</td><td class='an'>通信设备ETF</td><td class='ac'>515880</td><td>+10.5</td></tr>
+<tr><td>51</td><td class='an'>稀有金属ETF</td><td class='ac'>562800</td><td>+10.2</td></tr>
+<tr><td>52</td><td class='an'>日经225ETF</td><td class='ac'>513520</td><td>+8.7</td></tr>
+<tr><td>53</td><td class='an'>中证500ETF</td><td class='ac'>510500</td><td>+5.8</td></tr>
+<tr><td>54</td><td class='an'>中证1000ETF</td><td class='ac'>512100</td><td>+5.8</td></tr>
+<tr><td>55</td><td class='an'>A500ETF</td><td class='ac'>159351</td><td>+5.8</td></tr>
+<tr><td>56</td><td class='an'>5GETF</td><td class='ac'>515050</td><td>+5.8</td></tr>
+<tr><td>57</td><td class='an'>保险ETF</td><td class='ac'>159650</td><td>+5.4</td></tr>
+<tr><td>58</td><td class='an'>创业板ETF</td><td class='ac'>159915</td><td>+5.3</td></tr>
+<tr><td>59</td><td class='an'>人工智能ETF</td><td class='ac'>159819</td><td>+5.3</td></tr>
+<tr><td>60</td><td class='an'>消费电子ETF</td><td class='ac'>562950</td><td>+5.3</td></tr>
+<tr><td>61</td><td class='an'>上证50ETF</td><td class='ac'>510050</td><td>+5.2</td></tr>
+<tr><td>62</td><td class='an'>卫星ETF</td><td class='ac'>159206</td><td>+4.9</td></tr>
+<tr><td>63</td><td class='an'>医药ETF</td><td class='ac'>512010</td><td>+4.5</td></tr>
+<tr><td>64</td><td class='an'>医疗ETF</td><td class='ac'>512170</td><td>+4.3</td></tr>
+<tr><td>65</td><td class='an'>科创50ETF</td><td class='ac'>588000</td><td>+4.0</td></tr>
+<tr><td>66</td><td class='an'>芯片ETF</td><td class='ac'>159995</td><td>+4.0</td></tr>
+<tr><td>67</td><td class='an'>半导体ETF</td><td class='ac'>512480</td><td>+4.0</td></tr>
+<tr><td>68</td><td class='an'>科创半导体ETF</td><td class='ac'>588170</td><td>+4.0</td></tr>
+<tr><td>69</td><td class='an'>香港创新药ETF</td><td class='ac'>513120</td><td>+3.6</td></tr>
+<tr><td>70</td><td class='an'>创新药ETF</td><td class='ac'>159838</td><td>+3.6</td></tr>
+</tbody></table></div></body></html>

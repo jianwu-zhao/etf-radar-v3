@@ -1,0 +1,53 @@
+name: ETF Radar V3 Daily
+
+on:
+  schedule:
+    # 北京时间 15:30 = UTC 07:30
+    - cron: '30 7 * * 1-5'
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  run-strategy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run ETF Radar V3
+        run: python3 radar_strategy_v3.py --no-save
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: etf-plan-${{ github.run_id }}
+          path: reports/plan_v3_*.txt
+          retention-days: 30
+
+      - name: Commit reports to repo
+        run: |
+          git config user.name "ETF Bot"
+          git config user.email "bot@etf-radar.com"
+          git add reports/
+          git diff --cached --quiet || git commit -m "daily: etf plan $(date +%Y%m%d)"
+          git push
+
+      - name: Send Telegram notification
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: |
+          LATEST=$(ls -t reports/plan_v3_*.txt | head -1)
+          TEXT=$(cat "$LATEST" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()[:3800]))")
+          curl -s -X POST "https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "{\"chat_id\":\"$TG_CHAT_ID\",\"text\":$TEXT,\"parse_mode\":\"Markdown\"}" || true

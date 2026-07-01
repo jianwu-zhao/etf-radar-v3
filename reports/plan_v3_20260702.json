@@ -1,0 +1,143 @@
+{
+  "generated_at": "2026-07-02T00:44:20.710018",
+  "date": "20260702",
+  "market_regime": "偏多",
+  "target_position": 0.8,
+  "etf_total": 0.36,
+  "cash": 0.64,
+  "positions": [
+    {
+      "code": "518880",
+      "name": "黄金华安",
+      "price": 8.271,
+      "change_pct": -1.28,
+      "rsi14": 30.36,
+      "rsi6": 26.11,
+      "ma5": 8.355,
+      "ma20": 8.748,
+      "ma60": 9.407,
+      "momentum_20": -12.1,
+      "momentum_60": -17.49,
+      "volatility_20": 1.41,
+      "macd": {
+        "macd": -0.2807,
+        "signal": -0.258,
+        "histogram": -0.0228
+      },
+      "bollinger": {
+        "middle": 8.748,
+        "upper": 9.388,
+        "lower": 8.109,
+        "width": 1.278,
+        "percent_b": 12.66
+      },
+      "atr14": 0.17,
+      "score": 50,
+      "action": "超卖观察",
+      "stop": 8.016,
+      "take_profit": 8.696,
+      "theme": "黄金",
+      "weight": 0.08
+    },
+    {
+      "code": "510880",
+      "name": "红利华泰柏瑞",
+      "price": 2.963,
+      "change_pct": 1.61,
+      "rsi14": 30.58,
+      "rsi6": 30.93,
+      "ma5": 2.962,
+      "ma20": 3.159,
+      "ma60": 3.215,
+      "momentum_20": -10.43,
+      "momentum_60": -8.58,
+      "volatility_20": 1.04,
+      "macd": {
+        "macd": -0.0789,
+        "signal": -0.0516,
+        "histogram": -0.0273
+      },
+      "bollinger": {
+        "middle": 3.159,
+        "upper": 3.438,
+        "lower": 2.88,
+        "width": 0.558,
+        "percent_b": 14.85
+      },
+      "atr14": 0.063,
+      "score": 50,
+      "action": "确认买",
+      "stop": 2.869,
+      "take_profit": 3.121,
+      "theme": "金融",
+      "weight": 0.1429
+    },
+    {
+      "code": "159920",
+      "name": "恒生华夏",
+      "price": 1.351,
+      "change_pct": 0.3,
+      "rsi14": 32.61,
+      "rsi6": 32.72,
+      "ma5": 1.352,
+      "ma20": 1.416,
+      "ma60": 1.488,
+      "momentum_20": -11.06,
+      "momentum_60": -10.29,
+      "volatility_20": 1.21,
+      "macd": {
+        "macd": -0.0389,
+        "signal": -0.0334,
+        "histogram": -0.0055
+      },
+      "bollinger": {
+        "middle": 1.416,
+        "upper": 1.512,
+        "lower": 1.321,
+        "width": 0.191,
+        "percent_b": 15.86
+      },
+      "atr14": 0.025,
+      "score": 50,
+      "action": "超卖观察",
+      "stop": 1.313,
+      "take_profit": 1.413,
+      "theme": "港股",
+      "weight": 0.08
+    },
+    {
+      "code": "512800",
+      "name": "银行华宝",
+      "price": 0.737,
+      "change_pct": 0.41,
+      "rsi14": 33.92,
+      "rsi6": 26.15,
+      "ma5": 0.744,
+      "ma20": 0.776,
+      "ma60": 0.784,
+      "momentum_20": -6.71,
+      "momentum_60": -8.1,
+      "volatility_20": 1.15,
+      "macd": {
+        "macd": -0.0113,
+        "signal": -0.0058,
+        "histogram": -0.0056
+      },
+      "bollinger": {
+        "middle": 0.776,
+        "upper": 0.821,
+        "lower": 0.731,
+        "width": 0.091,
+        "percent_b": 7.13
+      },
+      "atr14": 0.017,
+      "score": 50,
+      "action": "超卖观察",
+      "stop": 0.712,
+      "take_profit": 0.779,
+      "theme": "金融",
+      "weight": 0.0571
+    }
+  ],
+  "all_scanned": 30
+}

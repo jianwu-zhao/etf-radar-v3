@@ -1,0 +1,730 @@
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ETF波段雷达V2</title>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#0f172a;color:#e2e8f0}
+.grade-S{background:#fee2e2;color:#991b1b}.grade-A{background:#ffedd5;color:#9a3412}.grade-B{background:#dbeafe;color:#1e40af}.grade-C{background:#f1f5f9;color:#475569}
+<h1>📡 ETF波段雷达 V2</h1>
+<div class="sub">更新：20260630　大盘：<span class="badge neutral">偏空</span>　市场：强势(MA60+3.4%)　建议仓位：100%　宽度：23.6%　多空比：0.55</div>
+<div class="hero-actions"><button onclick="manualRefresh()">🔄 立即更新</button><button onclick="location.href=location.pathname+'?v='+Date.now()">刷新页面</button><span id="refresh-status">静态页：如配置Webhook可触发后台更新</span></div>
+  <div class="kpi"><label>🏆 Top3</label><strong style="font-size:13px">酒ETF +46.1 / 传媒ETF +42.3 / 中概互联ET +37.3</strong><small>按V4分排序</small></div>
+<div class="rec-box" id="top-rec"><div class="rec-title">🎯 今日明确推荐 <small>优先级：只买前1~3个，不追高，必须带止损</small></div><div class="rec-grid"><div class="rec-card rec-first">
+<div class="rec-rank">#1</div><div class="rec-name"><b>酒ETF</b><span>512690</span></div>
+<div class="rec-score">+46.1<small>V4</small></div>
+<div class="rec-meta"><span>建议仓位 20%</span><span>信心 54%</span></div>
+<div class="rec-plan"><span>回踩买 0.381</span><span>回踩止损 0.355</span><span>止盈 0.420</span></div>
+<div class="rec-sig">绿柱缩短 · RSI32回弹 · 长下影 · 布林超卖</div>
+<div class="rec-rank">#2</div><div class="rec-name"><b>传媒ETF</b><span>512980</span></div>
+<div class="rec-score">+42.3<small>V4</small></div>
+<div class="rec-meta"><span>建议仓位 15%</span><span>信心 50%</span></div>
+<div class="rec-plan"><span>回踩买 0.793</span><span>回踩止损 0.741</span><span>止盈 0.872</span></div>
+<div class="rec-sig">MACD多头 · RSI37回弹 · 刚站上MA5 · 长下影</div>
+<div class="rec-rank">#3</div><div class="rec-name"><b>中概互联ETF</b><span>513050</span></div>
+<div class="rec-score">+37.3<small>V4</small></div>
+<div class="rec-meta"><span>建议仓位 10%</span><span>信心 46%</span></div>
+<div class="rec-plan"><span>回踩买 0.950</span><span>回踩止损 0.887</span><span>止盈 1.044</span></div>
+<div class="rec-sig">绿柱缩短 · 长下影 · 布林超卖 · RSI极低25</div>
+<div class="rec-rank">#4</div><div class="rec-name"><b>有色期货ETF</b><span>159980</span></div>
+<div class="rec-score">+37.1<small>V4</small></div>
+<div class="rec-meta"><span>建议仓位 10%</span><span>信心 45%</span></div>
+<div class="rec-plan"><span>回踩买 1.994</span><span>回踩止损 1.929</span><span>止盈 2.093</span></div>
+<div class="rec-sig">绿柱缩短 · RSI39回弹 · 布林超卖 · 安全边际</div>
+<div class="rec-rank">#5</div><div class="rec-name"><b>黄金ETF</b><span>518880</span></div>
+<div class="rec-score">+36.8<small>V4</small></div>
+<div class="rec-meta"><span>建议仓位 10%</span><span>信心 45%</span></div>
+<div class="rec-plan"><span>回踩买 8.127</span><span>回踩止损 7.733</span><span>止盈 8.717</span></div>
+<div class="rec-sig">绿柱缩短 · RSI33回弹 · 布林超卖 · 近20日低</div>
+<div class="sug-title">💼 因子组合（仓位 100%）</div>
+<div class="sug-grid"><div class="sug-item"><span class="sug-name">酒ETF</span><span class="sug-pct">22.1%</span><span class="sug-act">✅ 关注</span></div><div class="sug-item"><span class="sug-name">传媒ETF</span><span class="sug-pct">20.9%</span><span class="sug-act">✅ 关注</span></div><div class="sug-item"><span class="sug-name">中概互联ETF</span><span class="sug-pct">19.2%</span><span class="sug-act">👀 超卖</span></div><div class="sug-item"><span class="sug-name">有色期货ETF</span><span class="sug-pct">19.1%</span><span class="sug-act">✅ 关注</span></div><div class="sug-item"><span class="sug-name">电力ETF</span><span class="sug-pct">18.7%</span><span class="sug-act">👀 超卖</span></div><div class="sug-item"><span class="sug-name">现金</span><span class="sug-pct">0%</span><span class="sug-act">持有</span></div></div>
+<div class="toolbar"><div><h2>全部 72 只 ETF 因子雷达</h2>
+<div class="hint">V4数据驱动评分：拐点检测(60% IC~+0.07~+0.10) + 均值回归(25% 20日IC~+0.04) + 价格结构(15% 20日IC~+0.03) —— 基于90日滚动回测IC分析<br>排除规则：RSI>70 / 布林>80% / 连涨≥6天 / 远离MA60>25%；被排除的ETF评分打3折。拐点=MACD金叉+RSI反弹+放量阳线+站上MA5+下影线。ATR×2.2止损。</div>
+<div class="filters"><input id="q" placeholder="搜索ETF/代码" oninput="filterRows()"><button onclick="setFilter('all')">全部</button><button onclick="setFilter('buy')">只看可买</button><button onclick="setFilter('watch')">超卖</button><button onclick="setFilter('hideAvoid')">隐藏排除</button></div></div>
+<div class="legend"><span>拐点:MACD金叉+RSI反弹+放量阳线</span><span>回归:超卖反弹</span><span>结构:底部抬升</span><span>🚫被排除:过热</span><span>因子条 绿=强 蓝=中 红/灰=弱</span></div></div>
+<th>序</th><th>标的</th><th>操作建议</th><th>拐点信号</th><th>V4评分</th>
+<th>RSI/风控</th><th>月线</th><th>周线</th><th>日线</th><th>买点参考</th>
+<tr class="row-up" data-code="512690" data-price="0.393000" data-stop="0.366000" data-tp="0.420000" data-action="✅ 关注" data-name="酒ETF 512690" data-excluded="false">
+  <div class="an">酒ETF</div>
+  <div class="ac">512690 · RSI32 · 94分 <span class="grade grade-S">S</span></div>
+<td class="act-cell"><span class="act act-buy">✅ 关注</span><small>拐点初现:绿柱缩短,RSI32回弹</small></td>
+<td class="sig-cell"><small>绿柱缩短 · RSI32回弹 · 长下影 · 布林超卖 · 安全边际</small></td>
+<td class="score-cell pos"><b>+46.1</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI32</b><small>21%年波</small></td>
+  <small>止盈0.420</small>
+  <small>回踩止损0.355</small>
+<tr class="row-up" data-code="512980" data-price="0.818000" data-stop="0.764000" data-tp="0.872000" data-action="✅ 关注" data-name="传媒ETF 512980" data-excluded="false">
+  <div class="an">传媒ETF</div>
+  <div class="ac">512980 · RSI38 · 88分 <span class="grade grade-S">S</span></div>
+<td class="act-cell"><span class="act act-buy">✅ 关注</span><small>拐点初现:MACD多头,RSI37回弹</small></td>
+<td class="sig-cell"><small>MACD多头 · RSI37回弹 · 刚站上MA5 · 长下影 · 布林偏下 · 安全边际</small></td>
+<td class="score-cell pos"><b>+42.3</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI38</b><small>32%年波</small></td>
+  <small>止盈0.872</small>
+  <small>回踩止损0.741</small>
+<tr class="row-up" data-code="513050" data-price="0.979000" data-stop="0.914000" data-tp="1.044000" data-action="👀 超卖" data-name="中概互联ETF 513050" data-excluded="false">
+  <div class="an">中概互联ETF</div>
+  <div class="ac">513050 · RSI24 · 81分 <span class="grade grade-S">S</span></div>
+<td class="sig-cell"><small>绿柱缩短 · 长下影 · 布林超卖 · RSI极低25 · 安全边际</small></td>
+<td class="score-cell pos"><b>+37.3</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI24</b><small>27%年波</small></td>
+  <small>止盈1.044</small>
+  <small>回踩止损0.887</small>
+<tr class="row-up" data-code="159980" data-price="2.056000" data-stop="1.988000" data-tp="2.093000" data-action="✅ 关注" data-name="有色期货ETF 159980" data-excluded="false">
+  <div class="an">有色期货ETF</div>
+  <div class="ac">159980 · RSI39 · 81分 <span class="grade grade-S">S</span></div>
+<td class="act-cell"><span class="act act-buy">✅ 关注</span><small>拐点初现:绿柱缩短,RSI39回弹</small></td>
+<td class="sig-cell"><small>绿柱缩短 · RSI39回弹 · 布林超卖 · 安全边际</small></td>
+<td class="score-cell pos"><b>+37.1</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI39</b><small>20%年波</small></td>
+  <small>止盈2.093</small>
+  <small>回踩止损1.929</small>
+<tr class="row-up" data-code="518880" data-price="8.378000" data-stop="7.973000" data-tp="8.717000" data-action="👀 超卖" data-name="黄金ETF 518880" data-excluded="false">
+  <div class="an">黄金ETF</div>
+  <div class="ac">518880 · RSI33 · 80分 <span class="grade grade-S">S</span></div>
+<td class="sig-cell"><small>绿柱缩短 · RSI33回弹 · 布林超卖 · 近20日低 · 安全边际</small></td>
+<td class="score-cell pos"><b>+36.8</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI33</b><small>28%年波</small></td>
+  <small>止盈8.717</small>
+  <small>回踩止损7.733</small>
+<tr class="row-up" data-code="159937" data-price="8.351000" data-stop="7.947000" data-tp="8.689000" data-action="👀 超卖" data-name="黄金ETF 159937" data-excluded="false">
+  <div class="an">黄金ETF</div>
+  <div class="ac">159937 · RSI33 · 80分 <span class="grade grade-S">S</span></div>
+<td class="sig-cell"><small>绿柱缩短 · RSI33回弹 · 布林超卖 · 近20日低 · 安全边际</small></td>
+<td class="score-cell pos"><b>+36.8</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI33</b><small>28%年波</small></td>
+  <small>止盈8.689</small>
+  <small>回踩止损7.708</small>
+<tr class="row-up" data-code="518600" data-price="8.725000" data-stop="8.303000" data-tp="9.078000" data-action="👀 超卖" data-name="上海金ETF 518600" data-excluded="false">
+  <div class="an">上海金ETF</div>
+  <div class="ac">518600 · RSI33 · 80分 <span class="grade grade-S">S</span></div>
+<td class="sig-cell"><small>绿柱缩短 · RSI33回弹 · 布林超卖 · 近20日低 · 安全边际</small></td>
+<td class="score-cell pos"><b>+36.8</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI33</b><small>29%年波</small></td>
+  <small>止盈9.078</small>
+  <small>回踩止损8.054</small>
+<tr class="row-up" data-code="159611" data-price="1.032000" data-stop="0.978000" data-tp="1.080000" data-action="👀 超卖" data-name="电力ETF 159611" data-excluded="false">
+  <div class="an">电力ETF</div>
+  <div class="ac">159611 · RSI17 · 79分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>绿柱缩短 · 长下影 · 布林超卖 · 超跌8% · RSI极低17 · 近20日低</small></td>
+<td class="score-cell pos"><b>+35.8</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI17</b><small>19%年波</small></td>
+  <small>止盈1.080</small>
+  <small>回踩止损0.948</small>
+<tr class="row-up" data-code="515710" data-price="0.464000" data-stop="0.438000" data-tp="0.487000" data-action="👀 超卖" data-name="食品饮料ETF 515710" data-excluded="false">
+  <div class="an">食品饮料ETF</div>
+  <div class="ac">515710 · RSI33 · 78分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>绿柱缩短 · RSI33回弹 · 布林超卖 · 安全边际</small></td>
+<td class="score-cell pos"><b>+35.3</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI33</b><small>17%年波</small></td>
+  <small>止盈0.487</small>
+  <small>回踩止损0.425</small>
+<tr class="row-up" data-code="159996" data-price="1.456000" data-stop="1.408000" data-tp="1.482000" data-action="✅ 关注" data-name="家电ETF 159996" data-excluded="false">
+  <div class="an">家电ETF</div>
+  <div class="ac">159996 · RSI42 · 78分 <span class="grade grade-A">A</span></div>
+<td class="act-cell"><span class="act act-buy">✅ 关注</span><small>拐点初现:绿柱缩短,RSI42回弹</small></td>
+<td class="sig-cell"><small>绿柱缩短 · RSI42回弹 · 刚站上MA5 · 安全边际</small></td>
+<td class="score-cell pos"><b>+35.3</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI42</b><small>16%年波</small></td>
+  <small>止盈1.482</small>
+  <small>回踩止损1.366</small>
+<tr class="row-up" data-code="159825" data-price="0.660000" data-stop="0.621000" data-tp="0.697000" data-action="✅ 关注" data-name="农业ETF 159825" data-excluded="false">
+  <div class="an">农业ETF</div>
+  <div class="ac">159825 · RSI40 · 78分 <span class="grade grade-A">A</span></div>
+<td class="act-cell"><span class="act act-buy">✅ 关注</span><small>拐点初现:MACD多头,RSI40回弹</small></td>
+<td class="sig-cell"><small>MACD多头 · RSI40回弹 · 布林超卖 · 安全边际</small></td>
+<td class="score-cell pos"><b>+35.3</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI40</b><small>19%年波</small></td>
+  <small>止盈0.697</small>
+  <small>回踩止损0.602</small>
+<tr class="row-up" data-code="513220" data-price="0.868000" data-stop="0.818000" data-tp="0.914000" data-action="👀 超卖" data-name="日经ETF 513220" data-excluded="false">
+  <div class="an">日经ETF</div>
+  <div class="ac">513220 · RSI28 · 78分 <span class="grade grade-A">A</span></div>
+<td class="score-cell pos"><b>+35.3</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI28</b><small>25%年波</small></td>
+  <small>止盈0.914</small>
+  <small>回踩止损0.794</small>
+<tr class="row-up" data-code="159561" data-price="1.278000" data-stop="1.247000" data-tp="1.285000" data-action="⏳ 观察" data-name="德国ETF 159561" data-excluded="false">
+  <div class="an">德国ETF</div>
+  <div class="ac">159561 · RSI46 · 75分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>绿柱缩短 · RSI46中性 · 刚站上MA5 · 布林偏下 · 近20日低 · 安全边际</small></td>
+<td class="score-cell pos"><b>+33.5</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI46</b><small>20%年波</small></td>
+  <small>止盈1.285</small>
+  <small>回踩止损1.210</small>
+<tr class="row-up" data-code="560710" data-price="0.872000" data-stop="0.813000" data-tp="0.932000" data-action="⏳ 观察" data-name="船舶ETF 560710" data-excluded="false">
+  <div class="an">船舶ETF</div>
+  <div class="ac">560710 · RSI37 · 75分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>绿柱缩短 · RSI37回弹 · 布林超卖 · 安全边际</small></td>
+<td class="score-cell pos"><b>+33.5</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI37</b><small>34%年波</small></td>
+  <small>止盈0.932</small>
+  <small>回踩止损0.788</small>
+<tr class="row-up" data-code="159930" data-price="1.469000" data-stop="1.359000" data-tp="1.585000" data-action="⏳ 观察" data-name="能源ETF 159930" data-excluded="false">
+  <div class="an">能源ETF</div>
+  <div class="ac">159930 · RSI11 · 74分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>绿柱缩短 · 布林极超卖 · 超跌11% · RSI极低11 · 近20日低 · 安全边际</small></td>
+<td class="score-cell pos"><b>+33.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI11</b><small>25%年波</small></td>
+  <small>止盈1.585</small>
+  <small>回踩止损1.318</small>
+<tr class="row-up" data-code="513180" data-price="0.567000" data-stop="0.533000" data-tp="0.599000" data-action="⏳ 观察" data-name="恒生科技ETF 513180" data-excluded="false">
+  <div class="an">恒生科技ETF</div>
+  <div class="ac">513180 · RSI35 · 74分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>绿柱缩短 · RSI35回弹 · 布林偏下 · 安全边际</small></td>
+<td class="score-cell pos"><b>+32.8</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI35</b><small>25%年波</small></td>
+  <small>止盈0.599</small>
+  <small>回踩止损0.517</small>
+<tr class="row-up" data-code="159667" data-price="0.914000" data-stop="0.568000" data-tp="1.390000" data-action="👀 超卖" data-name="机床ETF 159667" data-excluded="false">
+  <div class="an">机床ETF</div>
+  <div class="ac">159667 · RSI10 · 73分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>绿柱缩短 · 刚站上MA5 · 布林偏下 · 超跌31% · RSI极低10</small></td>
+<td class="score-cell pos"><b>+32.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI10</b><small>73%年波</small></td>
+  <small>止盈1.390</small>
+  <small>回踩止损0.551</small>
+<tr class="row-up" data-code="511380" data-price="13.954000" data-stop="13.586000" data-tp="14.071000" data-action="⏳ 观察" data-name="可转债ETF 511380" data-excluded="false">
+  <div class="an">可转债ETF</div>
+  <div class="ac">511380 · RSI51 · 73分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>绿柱缩短 · RSI51中性 · 刚站上MA5 · 近20日低 · 安全边际</small></td>
+<td class="score-cell pos"><b>+32.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI51</b><small>12%年波</small></td>
+  <small>止盈14.071</small>
+  <small>回踩止损13.178</small>
+<tr class="row-up" data-code="513500" data-price="2.483000" data-stop="2.390000" data-tp="2.544000" data-action="⏳ 观察" data-name="标普500ETF 513500" data-excluded="false">
+  <div class="an">标普500ETF</div>
+  <div class="ac">513500 · RSI38 · 72分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>绿柱缩短 · RSI38回弹 · 布林超卖 · 近20日低</small></td>
+<td class="score-cell pos"><b>+31.6</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI38</b><small>16%年波</small></td>
+  <small>止盈2.544</small>
+  <small>回踩止损2.318</small>
+<tr class="row-up" data-code="159201" data-price="1.061000" data-stop="1.012000" data-tp="1.100000" data-action="⏳ 观察" data-name="自由现金流ETF 159201" data-excluded="false">
+  <div class="an">自由现金流ETF</div>
+  <div class="ac">159201 · RSI22 · 72分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>绿柱缩短 · 布林极超卖 · RSI极低22 · 近20日低 · 安全边际</small></td>
+<td class="score-cell pos"><b>+31.2</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI22</b><small>17%年波</small></td>
+  <small>止盈1.100</small>
+  <small>回踩止损0.982</small>
+<tr class="row-up" data-code="516310" data-price="1.214000" data-stop="1.153000" data-tp="1.267000" data-action="⏳ 观察" data-name="云计算ETF 516310" data-excluded="false">
+  <div class="an">云计算ETF</div>
+  <div class="ac">516310 · RSI30 · 72分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>RSI30回弹 · 布林极超卖 · 近20日低 · 安全边际</small></td>
+<td class="score-cell pos"><b>+31.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI30</b><small>14%年波</small></td>
+  <small>止盈1.267</small>
+  <small>回踩止损1.118</small>
+<tr class="row-up" data-code="515220" data-price="1.067000" data-stop="0.971000" data-tp="1.175000" data-action="⏳ 观察" data-name="煤炭ETF 515220" data-excluded="false">
+  <div class="an">煤炭ETF</div>
+  <div class="ac">515220 · RSI14 · 72分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>绿柱缩短 · 布林超卖 · 超跌14% · RSI极低14 · 近20日低 · 安全边际</small></td>
+<td class="score-cell pos"><b>+31.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI14</b><small>30%年波</small></td>
+  <small>止盈1.175</small>
+  <small>回踩止损0.942</small>
+<tr class="row-up" data-code="515030" data-price="1.850000" data-stop="1.708000" data-tp="2.002000" data-action="⏳ 观察" data-name="新能源车ETF 515030" data-excluded="false">
+  <div class="an">新能源车ETF</div>
+  <div class="ac">515030 · RSI48 · 70分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>绿柱缩短 · RSI48中性 · 刚站上MA5 · 布林偏下 · 安全边际</small></td>
+<td class="score-cell pos"><b>+29.8</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI48</b><small>30%年波</small></td>
+  <small>止盈2.002</small>
+  <small>回踩止损1.656</small>
+<tr class="row-up" data-code="563200" data-price="1.649000" data-stop="1.562000" data-tp="1.726000" data-action="⏳ 观察" data-name="中证2000ETF 563200" data-excluded="false">
+  <div class="an">中证2000ETF</div>
+  <div class="ac">563200 · RSI53 · 67分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>绿柱缩短 · RSI53中性 · 刚站上MA5</small></td>
+<td class="score-cell pos"><b>+28.2</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI53</b><small>20%年波</small></td>
+  <small>止盈1.726</small>
+  <small>回踩止损1.515</small>
+<tr class="row-up" data-code="511010" data-price="140.792000" data-stop="139.102000" data-tp="139.026000" data-action="⏳ 观察" data-name="国债ETF 511010" data-excluded="false">
+  <div class="an">国债ETF</div>
+  <div class="ac">511010 · RSI34 · 66分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>RSI34回弹 · 布林极超卖 · 近20日低 · 安全边际</small></td>
+<td class="score-cell pos"><b>+27.3</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI34</b><small>2%年波</small></td>
+  <small>止盈139.026</small>
+  <small>回踩止损134.929</small>
+<tr class="row-up" data-code="511260" data-price="134.854000" data-stop="133.236000" data-tp="133.163000" data-action="⏳ 观察" data-name="10年国债ETF 511260" data-excluded="false">
+  <div class="an">10年国债ETF</div>
+  <div class="ac">511260 · RSI32 · 66分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>RSI32回弹 · 布林极超卖 · 近20日低 · 安全边际</small></td>
+<td class="score-cell pos"><b>+27.3</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI32</b><small>2%年波</small></td>
+  <small>止盈133.163</small>
+  <small>回踩止损129.239</small>
+<tr class="row-up" data-code="516950" data-price="1.015000" data-stop="0.959000" data-tp="1.066000" data-action="⏳ 观察" data-name="基建ETF 516950" data-excluded="false">
+  <div class="an">基建ETF</div>
+  <div class="ac">516950 · RSI40 · 65分 <span class="grade grade-A">A</span></div>
+<td class="sig-cell"><small>RSI40回弹 · 布林极超卖 · 近20日低 · 安全边际</small></td>
+<td class="score-cell pos"><b>+26.8</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI40</b><small>21%年波</small></td>
+  <small>止盈1.066</small>
+  <small>回踩止损0.930</small>
+<tr class="row-up" data-code="159766" data-price="0.543000" data-stop="0.508000" data-tp="0.577000" data-action="⏳ 观察" data-name="旅游ETF 159766" data-excluded="false">
+  <div class="an">旅游ETF</div>
+  <div class="ac">159766 · RSI36 · 65分 <span class="grade grade-B">B</span></div>
+<td class="sig-cell"><small>RSI36回弹 · 布林极超卖 · 安全边际</small></td>
+<td class="score-cell pos"><b>+26.5</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI36</b><small>23%年波</small></td>
+  <small>止盈0.577</small>
+  <small>回踩止损0.493</small>
+<tr class="row-up" data-code="513100" data-price="2.204000" data-stop="2.063000" data-tp="2.342000" data-action="⏳ 观察" data-name="纳指ETF 513100" data-excluded="false">
+  <div class="an">纳指ETF</div>
+  <div class="ac">513100 · RSI50 · 64分 <span class="grade grade-B">B</span></div>
+<td class="sig-cell"><small>绿柱缩短 · RSI50中性 · 刚站上MA5</small></td>
+<td class="score-cell pos"><b>+26.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI50</b><small>22%年波</small></td>
+  <small>止盈2.342</small>
+  <small>回踩止损2.001</small>
+<tr class="row-up" data-code="159941" data-price="1.648000" data-stop="1.557000" data-tp="1.730000" data-action="⏳ 观察" data-name="纳指ETF 159941" data-excluded="false">
+  <div class="an">纳指ETF</div>
+  <div class="ac">159941 · RSI52 · 64分 <span class="grade grade-B">B</span></div>
+<td class="sig-cell"><small>绿柱缩短 · RSI52中性 · 刚站上MA5</small></td>
+<td class="score-cell pos"><b>+26.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI52</b><small>22%年波</small></td>
+  <small>止盈1.730</small>
+  <small>回踩止损1.511</small>
+<tr class="row-up" data-code="159985" data-price="1.985000" data-stop="1.937000" data-tp="1.995000" data-action="⏳ 等待" data-name="豆粕ETF 159985" data-excluded="false">
+  <div class="an">豆粕ETF</div>
+  <div class="ac">159985 · RSI52 · 62分 <span class="grade grade-B">B</span></div>
+<td class="sig-cell"><small>MACD多头 · RSI52中性 · 布林超卖 · 近20日低 · 安全边际</small></td>
+<td class="score-cell pos"><b>+24.7</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI52</b><small>16%年波</small></td>
+  <small>止盈1.995</small>
+  <small>回踩止损1.879</small>
+<tr class="row-up" data-code="159755" data-price="1.100000" data-stop="1.015000" data-tp="1.190000" data-action="⏳ 等待" data-name="电池ETF 159755" data-excluded="false">
+  <div class="an">电池ETF</div>
+  <div class="ac">159755 · RSI55 · 62分 <span class="grade grade-B">B</span></div>
+<td class="sig-cell"><small>MACD多头 · RSI55中性 · 刚站上MA5 · 安全边际</small></td>
+<td class="score-cell pos"><b>+24.4</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI55</b><small>32%年波</small></td>
+  <small>止盈1.190</small>
+  <small>回踩止损0.985</small>
+<tr class="row-up" data-code="562500" data-price="1.150000" data-stop="1.049000" data-tp="1.263000" data-action="⏳ 等待" data-name="机器人ETF 562500" data-excluded="false">
+  <div class="an">机器人ETF</div>
+  <div class="ac">562500 · RSI46 · 61分 <span class="grade grade-B">B</span></div>
+<td class="sig-cell"><small>绿柱缩短 · RSI46中性 · 刚站上MA5</small></td>
+<td class="score-cell pos"><b>+24.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI46</b><small>28%年波</small></td>
+  <small>止盈1.263</small>
+  <small>回踩止损1.017</small>
+<tr class="row-up" data-code="510880" data-price="2.916000" data-stop="2.781000" data-tp="3.025000" data-action="⏳ 等待" data-name="红利ETF 510880" data-excluded="false">
+  <div class="an">红利ETF</div>
+  <div class="ac">510880 · RSI16 · 61分 <span class="grade grade-B">B</span></div>
+<td class="sig-cell"><small>布林极超卖 · 超跌8% · RSI极低16 · 近20日低 · 安全边际</small></td>
+<td class="score-cell pos"><b>+24.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI16</b><small>14%年波</small></td>
+  <small>止盈3.025</small>
+  <small>回踩止损2.698</small>
+<tr class="row-up" data-code="515210" data-price="1.145000" data-stop="1.072000" data-tp="1.217000" data-action="⏳ 等待" data-name="钢铁ETF 515210" data-excluded="false">
+  <div class="an">钢铁ETF</div>
+  <div class="ac">515210 · RSI29 · 60分 <span class="grade grade-B">B</span></div>
+<td class="score-cell pos"><b>+23.6</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI29</b><small>24%年波</small></td>
+  <small>止盈1.217</small>
+  <small>回踩止损1.040</small>
+<tr class="row-up" data-code="560280" data-price="1.519000" data-stop="1.415000" data-tp="1.624000" data-action="⏳ 等待" data-name="工程机械ETF 560280" data-excluded="false">
+  <div class="an">工程机械ETF</div>
+  <div class="ac">560280 · RSI28 · 60分 <span class="grade grade-B">B</span></div>
+<td class="score-cell pos"><b>+23.6</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI28</b><small>26%年波</small></td>
+  <small>止盈1.624</small>
+  <small>回踩止损1.373</small>
+<tr class="row-up" data-code="512400" data-price="1.854000" data-stop="1.654000" data-tp="2.089000" data-action="⏳ 等待" data-name="有色金属ETF 512400" data-excluded="false">
+  <div class="an">有色金属ETF</div>
+  <div class="ac">512400 · RSI49 · 59分 <span class="grade grade-B">B</span></div>
+<td class="sig-cell"><small>RSI49中性 · 布林超卖 · 底部抬升 · 安全边际</small></td>
+<td class="score-cell pos"><b>+22.8</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI49</b><small>40%年波</small></td>
+  <small>止盈2.089</small>
+  <small>回踩止损1.605</small>
+<tr class="row-up" data-code="159869" data-price="1.098000" data-stop="1.018000" data-tp="1.181000" data-action="⏳ 等待" data-name="游戏ETF 159869" data-excluded="false">
+  <div class="an">游戏ETF</div>
+  <div class="ac">159869 · RSI48 · 55分 <span class="grade grade-B">B</span></div>
+<td class="sig-cell"><small>MACD多头 · RSI48中性 · 安全边际</small></td>
+<td class="score-cell pos"><b>+20.2</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI48</b><small>32%年波</small></td>
+  <small>止盈1.181</small>
+  <small>回踩止损0.988</small>
+<tr class="row-up" data-code="512800" data-price="0.734000" data-stop="0.697000" data-tp="0.766000" data-action="⏳ 等待" data-name="银行ETF 512800" data-excluded="false">
+  <div class="an">银行ETF</div>
+  <div class="ac">512800 · RSI30 · 55分 <span class="grade grade-B">B</span></div>
+<td class="score-cell pos"><b>+20.2</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI30</b><small>50%年波</small></td>
+  <small>止盈0.766</small>
+  <small>回踩止损0.676</small>
+<tr class="row-up" data-code="159698" data-price="0.827000" data-stop="0.780000" data-tp="0.871000" data-action="⏳ 等待" data-name="粮食ETF 159698" data-excluded="false">
+  <div class="an">粮食ETF</div>
+  <div class="ac">159698 · RSI30 · 55分 <span class="grade grade-B">B</span></div>
+<td class="score-cell pos"><b>+20.2</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI30</b><small>20%年波</small></td>
+  <small>止盈0.871</small>
+  <small>回踩止损0.756</small>
+<tr class="row-up" data-code="510300" data-price="5.019000" data-stop="4.809000" data-tp="5.174000" data-action="⏳ 等待" data-name="沪深300ETF 510300" data-excluded="false">
+  <div class="an">沪深300ETF</div>
+  <div class="ac">510300 · RSI60 · 54分 <span class="grade grade-B">B</span></div>
+<td class="sig-cell"><small>MACD多头 · 刚站上MA5 · 底部抬升</small></td>
+<td class="score-cell pos"><b>+19.2</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI60</b><small>16%年波</small></td>
+  <small>止盈5.174</small>
+  <small>回踩止损4.665</small>
+<tr class="row-up" data-code="512880" data-price="1.126000" data-stop="1.039000" data-tp="1.191000" data-action="⏳ 等待" data-name="证券ETF 512880" data-excluded="false">
+  <div class="an">证券ETF</div>
+  <div class="ac">512880 · RSI68 · 54分 <span class="grade grade-B">B</span></div>
+<td class="sig-cell"><small>MACD多头 · 刚站上MA5 · 底部抬升</small></td>
+<td class="score-cell pos"><b>+19.2</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI68</b><small>24%年波</small></td>
+  <small>止盈1.191</small>
+  <small>回踩止损0.986</small>
+<tr class="row-up" data-code="515790" data-price="1.042000" data-stop="0.976000" data-tp="1.107000" data-action="⏳ 等待" data-name="光伏ETF 515790" data-excluded="false">
+  <div class="an">光伏ETF</div>
+  <div class="ac">515790 · RSI57 · 53分 <span class="grade grade-B">B</span></div>
+<td class="sig-cell"><small>MACD多头 · 刚站上MA5 · 安全边际</small></td>
+<td class="score-cell pos"><b>+18.4</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI57</b><small>33%年波</small></td>
+  <small>止盈1.107</small>
+  <small>回踩止损0.946</small>
+<tr class="row-up" data-code="512660" data-price="1.280000" data-stop="1.201000" data-tp="1.356000" data-action="⏳ 等待" data-name="军工ETF 512660" data-excluded="false">
+  <div class="an">军工ETF</div>
+  <div class="ac">512660 · RSI60 · 53分 <span class="grade grade-B">B</span></div>
+<td class="sig-cell"><small>MACD多头 · 刚站上MA5 · 安全边际</small></td>
+<td class="score-cell pos"><b>+18.4</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI60</b><small>30%年波</small></td>
+  <small>止盈1.356</small>
+  <small>回踩止损1.165</small>
+<tr class="row-up" data-code="159259" data-price="1.776000" data-stop="1.600000" data-tp="1.880000" data-action="⏳ 等待" data-name="成长100ETF 159259" data-excluded="false">
+  <div class="an">成长100ETF</div>
+  <div class="ac">159259 · RSI67 · 52分 <span class="grade grade-B">B</span></div>
+<td class="sig-cell"><small>MACD多头 · 刚站上MA5 · 底部抬升</small></td>
+<td class="score-cell pos"><b>+17.7</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI67</b><small>36%年波</small></td>
+  <small>止盈1.880</small>
+  <small>回踩止损1.475</small>
+<tr class="row-up" data-code="159566" data-price="2.269000" data-stop="2.099000" data-tp="2.448000" data-action="⏳ 等待" data-name="新能源电池ETF 159566" data-excluded="false">
+  <div class="an">新能源电池ETF</div>
+  <div class="ac">159566 · RSI56 · 49分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头 · 刚站上MA5</small></td>
+<td class="score-cell pos"><b>+16.2</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI56</b><small>33%年波</small></td>
+  <small>止盈2.448</small>
+  <small>回踩止损2.036</small>
+<tr class="row-up" data-code="513090" data-price="1.779000" data-stop="1.630000" data-tp="1.942000" data-action="⏳ 等待" data-name="香港证券ETF 513090" data-excluded="false">
+  <div class="an">香港证券ETF</div>
+  <div class="ac">513090 · RSI54 · 48分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>RSI54中性 · 底部抬升 · 安全边际</small></td>
+<td class="score-cell pos"><b>+15.5</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI54</b><small>31%年波</small></td>
+  <small>止盈1.942</small>
+  <small>回踩止损1.581</small>
+<tr class="row-up" data-code="159870" data-price="0.862000" data-stop="0.798000" data-tp="0.930000" data-action="⏳ 等待" data-name="化工ETF 159870" data-excluded="false">
+  <div class="an">化工ETF</div>
+  <div class="ac">159870 · RSI61 · 48分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头 · 长下影 · 底部抬升</small></td>
+<td class="score-cell pos"><b>+15.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI61</b><small>27%年波</small></td>
+  <small>止盈0.930</small>
+  <small>回踩止损0.774</small>
+<tr class="row-up" data-code="513060" data-price="0.483000" data-stop="0.447000" data-tp="0.521000" data-action="⏳ 等待" data-name="恒生医疗ETF 513060" data-excluded="false">
+  <div class="an">恒生医疗ETF</div>
+  <div class="ac">513060 · RSI59 · 46分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头 · 安全边际</small></td>
+<td class="score-cell pos"><b>+14.2</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI59</b><small>31%年波</small></td>
+  <small>止盈0.521</small>
+  <small>回踩止损0.433</small>
+<tr class="row-up" data-code="516150" data-price="2.050000" data-stop="1.865000" data-tp="2.258000" data-action="⏳ 等待" data-name="稀土ETF 516150" data-excluded="false">
+  <div class="an">稀土ETF</div>
+  <div class="ac">516150 · RSI57 · 43分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>刚站上MA5 · 底部抬升</small></td>
+<td class="score-cell pos"><b>+12.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI57</b><small>38%年波</small></td>
+  <small>止盈2.258</small>
+  <small>回踩止损1.809</small>
+<tr class="row-up" data-code="159326" data-price="2.088000" data-stop="1.927000" data-tp="2.259000" data-action="⏳ 等待" data-name="电网设备ETF 159326" data-excluded="false">
+  <div class="an">电网设备ETF</div>
+  <div class="ac">159326 · RSI51 · 42分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>RSI51中性 · 底部抬升</small></td>
+<td class="score-cell pos"><b>+11.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI51</b><small>31%年波</small></td>
+  <small>止盈2.259</small>
+  <small>回踩止损1.869</small>
+<tr class="row-up" data-code="515880" data-price="1.796000" data-stop="1.594000" data-tp="2.013000" data-action="⏳ 等待" data-name="通信设备ETF 515880" data-excluded="false">
+  <div class="an">通信设备ETF</div>
+  <div class="ac">515880 · RSI56 · 41分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>刚站上MA5 · 底部抬升</small></td>
+<td class="score-cell pos"><b>+10.5</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI56</b><small>79%年波</small></td>
+  <small>止盈2.013</small>
+  <small>回踩止损1.530</small>
+<tr class="row-up" data-code="562800" data-price="1.142000" data-stop="1.026000" data-tp="1.276000" data-action="⏳ 等待" data-name="稀有金属ETF 562800" data-excluded="false">
+  <div class="an">稀有金属ETF</div>
+  <div class="ac">562800 · RSI62 · 40分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头 · 底部抬升</small></td>
+<td class="score-cell pos"><b>+10.2</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI62</b><small>40%年波</small></td>
+  <small>止盈1.276</small>
+  <small>回踩止损0.996</small>
+<tr class="row-up" data-code="513520" data-price="2.517000" data-stop="2.262000" data-tp="2.779000" data-action="⏳ 等待" data-name="日经225ETF 513520" data-excluded="false">
+  <div class="an">日经225ETF</div>
+  <div class="ac">513520 · RSI59 · 38分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头 · 底部抬升</small></td>
+<td class="score-cell pos"><b>+8.7</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI59</b><small>30%年波</small></td>
+  <small>止盈2.779</small>
+  <small>回踩止损2.169</small>
+<tr class="row-excluded" data-code="510500" data-price="9.194000" data-stop="8.709000" data-tp="9.293000" data-action="🚫 排除" data-name="中证500ETF 510500" data-excluded="true">
+  <div class="an">中证500ETF</div>
+  <div class="ac">510500 · RSI73 · 34分 <span class="grade grade-C">C</span></div>
+<td class="act-cell"><span class="act act-avoid">🚫 排除</span><small>过热:RSI过热73,布林超买92%</small></td>
+<td class="sig-cell"><small>MACD多头 · 刚站上MA5 · 底部抬升<br><span class="sig-ex">🚫RSI过热73/布林超买92%</span></small></td>
+<td class="score-cell pos"><b>+5.8</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI73</b><small>22%年波</small></td>
+  <small>止盈9.293</small>
+  <small>回踩止损8.156</small>
+<tr class="row-excluded" data-code="512100" data-price="3.577000" data-stop="3.388000" data-tp="3.709000" data-action="🚫 排除" data-name="中证1000ETF 512100" data-excluded="true">
+  <div class="an">中证1000ETF</div>
+  <div class="ac">512100 · RSI68 · 34分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头 · 刚站上MA5 · 底部抬升<br><span class="sig-ex">🚫布林超买83%</span></small></td>
+<td class="score-cell pos"><b>+5.8</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI68</b><small>22%年波</small></td>
+  <small>止盈3.709</small>
+  <small>回踩止损3.256</small>
+<tr class="row-excluded" data-code="159351" data-price="1.347000" data-stop="1.285000" data-tp="1.393000" data-action="🚫 排除" data-name="A500ETF 159351" data-excluded="true">
+  <div class="an">A500ETF</div>
+  <div class="ac">159351 · RSI64 · 34分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头 · 刚站上MA5 · 底部抬升<br><span class="sig-ex">🚫布林超买84%</span></small></td>
+<td class="score-cell pos"><b>+5.8</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI64</b><small>17%年波</small></td>
+  <small>止盈1.393</small>
+  <small>回踩止损1.243</small>
+<tr class="row-excluded" data-code="515050" data-price="1.397000" data-stop="1.240000" data-tp="1.518000" data-action="🚫 排除" data-name="5GETF 515050" data-excluded="true">
+  <div class="an">5GETF</div>
+  <div class="ac">515050 · RSI62 · 34分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头 · 刚站上MA5 · 底部抬升<br><span class="sig-ex">🚫布林超买80%</span></small></td>
+<td class="score-cell pos"><b>+5.8</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI62</b><small>77%年波</small></td>
+  <small>止盈1.518</small>
+  <small>回踩止损1.153</small>
+<tr class="row-excluded" data-code="159650" data-price="107.803000" data-stop="104.569000" data-tp="109.275000" data-action="🚫 排除" data-name="保险ETF 159650" data-excluded="true">
+  <div class="an">保险ETF</div>
+  <div class="ac">159650 · RSI76 · 33分 <span class="grade grade-C">C</span></div>
+<td class="act-cell"><span class="act act-avoid">🚫 排除</span><small>过热:RSI过热76,布林超买100%</small></td>
+<td class="sig-cell"><small>MACD多头 · 近20日低 · 安全边际<br><span class="sig-ex">🚫RSI过热76/布林超买100%</span></small></td>
+<td class="score-cell pos"><b>+5.4</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI76</b><small>1%年波</small></td>
+  <small>止盈109.275</small>
+  <small>回踩止损101.432</small>
+<tr class="row-excluded" data-code="159915" data-price="4.364000" data-stop="4.038000" data-tp="4.577000" data-action="🚫 排除" data-name="创业板ETF 159915" data-excluded="true">
+  <div class="an">创业板ETF</div>
+  <div class="ac">159915 · RSI64 · 33分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头 · 刚站上MA5 · 底部抬升<br><span class="sig-ex">🚫布林超买84%</span></small></td>
+<td class="score-cell pos"><b>+5.3</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI64</b><small>29%年波</small></td>
+  <small>止盈4.577</small>
+  <small>回踩止损3.807</small>
+<tr class="row-excluded" data-code="159819" data-price="2.232000" data-stop="2.031000" data-tp="2.288000" data-action="🚫 排除" data-name="人工智能ETF 159819" data-excluded="true">
+  <div class="an">人工智能ETF</div>
+  <div class="ac">159819 · RSI68 · 33分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头 · 刚站上MA5 · 底部抬升<br><span class="sig-ex">🚫布林超买100%</span></small></td>
+<td class="score-cell pos"><b>+5.3</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI68</b><small>37%年波</small></td>
+  <small>止盈2.288</small>
+  <small>回踩止损1.833</small>
+<tr class="row-excluded" data-code="562950" data-price="2.154000" data-stop="1.922000" data-tp="2.190000" data-action="🚫 排除" data-name="消费电子ETF 562950" data-excluded="true">
+  <div class="an">消费电子ETF</div>
+  <div class="ac">562950 · RSI70 · 33分 <span class="grade grade-C">C</span></div>
+<td class="act-cell"><span class="act act-avoid">🚫 排除</span><small>过热:RSI过热70,布林超买95%,远离MA60+32%</small></td>
+<td class="sig-cell"><small>MACD多头 · 刚站上MA5 · 底部抬升<br><span class="sig-ex">🚫RSI过热70/布林超买95%/远离MA60+32%</span></small></td>
+<td class="score-cell pos"><b>+5.3</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI70</b><small>36%年波</small></td>
+  <small>止盈2.190</small>
+  <small>回踩止损1.682</small>
+<tr class="row-excluded" data-code="510050" data-price="3.083000" data-stop="2.961000" data-tp="3.168000" data-action="🚫 排除" data-name="上证50ETF 510050" data-excluded="true">
+  <div class="an">上证50ETF</div>
+  <div class="ac">510050 · RSI66 · 33分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头 · 底部抬升 · 安全边际<br><span class="sig-ex">🚫布林超买88%</span></small></td>
+<td class="score-cell pos"><b>+5.2</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI66</b><small>14%年波</small></td>
+  <small>止盈3.168</small>
+  <small>回踩止损2.872</small>
+<tr class="row-excluded" data-code="159206" data-price="1.755000" data-stop="1.601000" data-tp="1.860000" data-action="🚫 排除" data-name="卫星ETF 159206" data-excluded="true">
+  <div class="an">卫星ETF</div>
+  <div class="ac">159206 · RSI62 · 32分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头 · 刚站上MA5<br><span class="sig-ex">🚫布林超买121%</span></small></td>
+<td class="score-cell pos"><b>+4.9</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI62</b><small>40%年波</small></td>
+  <small>止盈1.860</small>
+  <small>回踩止损1.498</small>
+<tr class="row-excluded" data-code="512010" data-price="0.350000" data-stop="0.327000" data-tp="0.365000" data-action="🚫 排除" data-name="医药ETF 512010" data-excluded="true">
+  <div class="an">医药ETF</div>
+  <div class="ac">512010 · RSI71 · 32分 <span class="grade grade-C">C</span></div>
+<td class="act-cell"><span class="act act-avoid">🚫 排除</span><small>过热:RSI过热71,布林超买98%</small></td>
+<td class="sig-cell"><small>MACD多头 · 底部抬升<br><span class="sig-ex">🚫RSI过热71/布林超买98%</span></small></td>
+<td class="score-cell pos"><b>+4.5</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI71</b><small>21%年波</small></td>
+  <small>止盈0.365</small>
+  <small>回踩止损0.310</small>
+<tr class="row-excluded" data-code="512170" data-price="0.306000" data-stop="0.288000" data-tp="0.323000" data-action="🚫 排除" data-name="医疗ETF 512170" data-excluded="true">
+  <div class="an">医疗ETF</div>
+  <div class="ac">512170 · RSI65 · 31分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头 · 安全边际<br><span class="sig-ex">🚫布林超买82%</span></small></td>
+<td class="score-cell pos"><b>+4.3</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI65</b><small>21%年波</small></td>
+  <small>止盈0.323</small>
+  <small>回踩止损0.279</small>
+<tr class="row-excluded" data-code="588000" data-price="2.344000" data-stop="2.133000" data-tp="2.192000" data-action="🚫 排除" data-name="科创50ETF 588000" data-excluded="true">
+  <div class="an">科创50ETF</div>
+  <div class="ac">588000 · RSI88 · 31分 <span class="grade grade-C">C</span></div>
+<td class="act-cell"><span class="act act-avoid">🚫 排除</span><small>过热:RSI过热88,布林超买104%,远离MA60+34%</small></td>
+<td class="sig-cell"><small>MACD多头 · 底部抬升<br><span class="sig-ex">🚫RSI过热88/布林超买104%/远离MA60+34%</span></small></td>
+<td class="score-cell pos"><b>+4.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI88</b><small>35%年波</small></td>
+  <small>止盈2.192</small>
+  <small>回踩止损1.757</small>
+<tr class="row-excluded" data-code="159995" data-price="3.390000" data-stop="3.047000" data-tp="3.111000" data-action="🚫 排除" data-name="芯片ETF 159995" data-excluded="true">
+  <div class="an">芯片ETF</div>
+  <div class="ac">159995 · RSI88 · 31分 <span class="grade grade-C">C</span></div>
+<td class="act-cell"><span class="act act-avoid">🚫 排除</span><small>过热:RSI过热88,布林超买100%,远离MA60+47%</small></td>
+<td class="sig-cell"><small>MACD多头 · 底部抬升<br><span class="sig-ex">🚫RSI过热88/布林超买100%/远离MA60+47%</span></small></td>
+<td class="score-cell pos"><b>+4.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI88</b><small>40%年波</small></td>
+  <small>止盈3.111</small>
+  <small>回踩止损2.428</small>
+<tr class="row-excluded" data-code="512480" data-price="3.005000" data-stop="2.708000" data-tp="2.725000" data-action="🚫 排除" data-name="半导体ETF 512480" data-excluded="true">
+  <div class="an">半导体ETF</div>
+  <div class="ac">512480 · RSI91 · 31分 <span class="grade grade-C">C</span></div>
+<td class="act-cell"><span class="act act-avoid">🚫 排除</span><small>过热:RSI过热91,布林超买101%,远离MA60+49%</small></td>
+<td class="sig-cell"><small>MACD多头 · 底部抬升<br><span class="sig-ex">🚫RSI过热91/布林超买101%/远离MA60+49%</span></small></td>
+<td class="score-cell pos"><b>+4.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI91</b><small>40%年波</small></td>
+  <small>止盈2.725</small>
+  <small>回踩止损2.138</small>
+<tr class="row-excluded" data-code="588170" data-price="4.132000" data-stop="3.677000" data-tp="3.461000" data-action="🚫 排除" data-name="科创半导体ETF 588170" data-excluded="true">
+  <div class="an">科创半导体ETF</div>
+  <div class="ac">588170 · RSI96 · 31分 <span class="grade grade-C">C</span></div>
+<td class="act-cell"><span class="act act-avoid">🚫 排除</span><small>过热:RSI过热96,布林超买104%,连涨9天</small></td>
+<td class="sig-cell"><small>MACD多头 · 底部抬升<br><span class="sig-ex">🚫RSI过热96/布林超买104%/连涨9天</span></small></td>
+<td class="score-cell pos"><b>+4.0</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI96</b><small>44%年波</small></td>
+  <small>止盈3.461</small>
+  <small>回踩止损2.644</small>
+<tr class="row-excluded" data-code="513120" data-price="1.058000" data-stop="0.967000" data-tp="1.145000" data-action="🚫 排除" data-name="香港创新药ETF 513120" data-excluded="true">
+  <div class="an">香港创新药ETF</div>
+  <div class="ac">513120 · RSI63 · 30分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头<br><span class="sig-ex">🚫布林超买83%</span></small></td>
+<td class="score-cell pos"><b>+3.6</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI63</b><small>36%年波</small></td>
+  <small>止盈1.145</small>
+  <small>回踩止损0.927</small>
+<tr class="row-excluded" data-code="159838" data-price="0.539000" data-stop="0.506000" data-tp="0.565000" data-action="🚫 排除" data-name="创新药ETF 159838" data-excluded="true">
+  <div class="an">创新药ETF</div>
+  <div class="ac">159838 · RSI66 · 30分 <span class="grade grade-C">C</span></div>
+<td class="sig-cell"><small>MACD多头<br><span class="sig-ex">🚫布林超买97%</span></small></td>
+<td class="score-cell pos"><b>+3.6</b><small>V4评分</small></td>
+<td class="pred-cell"><b>RSI66</b><small>19%年波</small></td>
+  <small>止盈0.565</small>
+  <small>回踩止损0.485</small>
+<div class="vp-kpis"><span>权益 <b>99302</b></span><span>收益 <b class="neg">-0.70%</b></span><span>现金 <b>39720</b></span><span>仓位 <b>60%</b></span></div>
+<table class="vp-table"><thead><tr><th>标的</th><th>数量</th><th>成本</th><th>现价</th><th>市值</th><th>盈亏</th><th>持有</th><th>止损</th></tr></thead><tbody><tr><td>机床ETF<br><small>159667</small></td><td>22051</td><td>0.914</td><td>0.914</td><td>20155</td><td class="pos">+0.0%</td><td>18天</td><td>0.542</td></tr><tr><td>家电ETF<br><small>159996</small></td><td>13635</td><td>1.440</td><td>1.456</td><td>19853</td><td class="pos">+1.1%</td><td>4天</td><td>1.392</td></tr><tr><td>钢铁ETF<br><small>515210</small></td><td>17096</td><td>1.149</td><td>1.145</td><td>19575</td><td class="neg">-0.3%</td><td>3天</td><td>1.078</td></tr></tbody></table>
+<div class="vt-list"><div class="vt-item"><b>BUY</b> 钢铁ETF <span>1.149</span> <small>✅ 关注</small></div><div class="vt-item"><b>SELL</b> 传媒ETF <span>0.800</span> <small>持有20天</small></div><div class="vt-item"><b>BUY</b> 家电ETF <span>1.440</span> <small>✅ 关注</small></div><div class="vt-item"><b>SELL</b> 豆粕ETF <span>1.996</span> <small>信号消失</small></div><div class="vt-item"><b>BUY</b> 豆粕ETF <span>2.007</span> <small>✅ 关注</small></div><div class="vt-item"><b>SELL</b> 钢铁ETF <span>1.138</span> <small>持有20天</small></div><div class="vt-item"><b>BUY</b> 机床ETF <span>0.914</span> <small>✅ 关注</small></div><div class="vt-item"><b>SELL</b> 游戏ETF <span>1.099</span> <small>持有20天</small></div></div></div>
+<input id="mh-code" placeholder="ETF代码，如 518880">
+<button onclick="addManualHolding()">添加/更新</button>
+<table class="vp-table"><thead><tr><th>ETF</th><th>数量</th><th>成本</th><th>现价</th><th>市值</th><th>盈亏</th><th>系统建议</th><th>T+1风控</th><th>止损/止盈</th><th>操作</th></tr></thead><tbody id="manual-body"><tr><td colspan="10" class="muted">暂无手动持仓</td></tr></tbody></table>
+<div class="muted" style="margin-top:8px">说明：现价来自当前雷达页面；如果代码不在ETF池里，只记录不估值。</div></div>
+<input id="bark-url" placeholder="Bark URL，如 https://api.day.app/KEY">
+<input id="tg-bot" placeholder="Telegram Bot Token，可空">
+<input id="tg-chat" placeholder="Telegram Chat ID，可空">
+<input id="serverchan-key" placeholder="Server酱 SendKey，可空">
+<input id="update-webhook-url" placeholder="更新Webhook URL，可空，用于立即更新">
+<button onclick="saveAlertConfig()">保存配置</button>
+<button onclick="testAlert()">测试提醒</button>
+<div class="muted" style="margin-top:8px">支持：浏览器、Bark、Telegram、PushPlus、Server酱、通用Webhook、邮件草稿。配置只保存在你的浏览器本地。</div></div>
+<div class="chlog-box"><div class="chlog-title">🧬 因子周报 <small>20260626</small></div><table class="vp-table"><thead><tr><th>因子</th><th>5日IC</th><th>10日IC</th><th>20日IC</th><th>结论</th></tr></thead><tbody><tr><td>均值回归</td><td>+0.000</td><td>+0.000</td><td>+0.000</td><td class="neg">降权</td></tr><tr><td>拐点检测</td><td>+0.000</td><td>+0.000</td><td>+0.000</td><td class="neg">降权</td></tr><tr><td>相对强度</td><td>+0.000</td><td>+0.000</td><td>+0.000</td><td class="neg">降权</td></tr><tr><td>低波动</td><td>+0.000</td><td>+0.000</td><td>+0.000</td><td class="neg">降权</td></tr><tr><td>量价异动</td><td>+0.000</td><td>+0.000</td><td>+0.000</td><td class="neg">降权</td></tr><tr><td>价格结构</td><td>+0.000</td><td>+0.000</td><td>+0.000</td><td class="neg">降权</td></tr></tbody></table></div>
+<table class="trend-table"><tbody><tr><th>ETF</th><th>06/23</th><th>06/24</th><th>06/25</th><th>06/26</th><th>06/30</th><th>趋势</th></tr><tr><td class="tname">酒ETF<br><span class="tcode">512690</span></td><td class="tval tup">+20.8</td><td class="tval tup">+20.8</td><td class="tval tup">+27.8</td><td class="tval tup">+24.0</td><td class="tval tup">+41.3</td><td class="tval tup"><b>↗ +20.5</b></td></tr><tr><td class="tname">传媒ETF<br><span class="tcode">512980</span></td><td class="tval tup">+38.0</td><td class="tval tup">+35.0</td><td class="tval tup">+39.8</td><td class="tval tup">+38.2</td><td class="tval tup">+35.0</td><td class="tval "><b>→ -3.0</b></td></tr><tr><td class="tname">中概互联ETF<br><span class="tcode">513050</span></td><td class="tval tup">+28.0</td><td class="tval tup">+24.0</td><td class="tval tup">+31.2</td><td class="tval tup">+24.0</td><td class="tval tup">+37.3</td><td class="tval tup"><b>↗ +9.3</b></td></tr><tr><td class="tname">有色期货ETF<br><span class="tcode">159980</span></td><td class="tval tup">+22.9</td><td class="tval tup">+29.8</td><td class="tval tup">+34.6</td><td class="tval tup">+34.6</td><td class="tval tup">+26.8</td><td class="tval tup"><b>↗ +3.9</b></td></tr><tr><td class="tname">黄金ETF<br><span class="tcode">518880</span></td><td class="tval tup">+38.8</td><td class="tval tup">+20.2</td><td class="tval tup">+23.1</td><td class="tval tup">+25.1</td><td class="tval tup">+33.9</td><td class="tval tdown"><b>↘ -4.9</b></td></tr><tr><td class="tname">黄金ETF<br><span class="tcode">159937</span></td><td class="tval tup">+38.8</td><td class="tval tup">+20.2</td><td class="tval tup">+23.1</td><td class="tval tup">+25.1</td><td class="tval tup">+29.0</td><td class="tval tdown"><b>↘ -9.8</b></td></tr><tr><td class="tname">上海金ETF<br><span class="tcode">518600</span></td><td class="tval tup">+38.8</td><td class="tval tup">+20.2</td><td class="tval tup">+23.1</td><td class="tval tup">+25.1</td><td class="tval tup">+29.0</td><td class="tval tdown"><b>↘ -9.8</b></td></tr><tr><td class="tname">电力ETF<br><span class="tcode">159611</span></td><td class="tval tup">+22.2</td><td class="tval tup">+20.2</td><td class="tval tup">+24.0</td><td class="tval tup">+24.0</td><td class="tval tup">+35.8</td><td class="tval tup"><b>↗ +13.6</b></td></tr><tr><td class="tname">食品饮料ETF<br><span class="tcode">515710</span></td><td class="tval tup">+21.0</td><td class="tval tup">+21.0</td><td class="tval tup">+22.2</td><td class="tval tup">+22.2</td><td class="tval tup">+35.3</td><td class="tval tup"><b>↗ +14.3</b></td></tr><tr><td class="tname">家电ETF<br><span class="tcode">159996</span></td><td class="tval tup">+32.0</td><td class="tval tup">+32.0</td><td class="tval tup">+29.8</td><td class="tval tup">+19.0</td><td class="tval tup">+43.6</td><td class="tval tup"><b>↗ +11.6</b></td></tr></tbody></table>
+<div class="diary-grid"><div class="diary-day"><b>06/30</b><span class="diary-top">酒ETF +46.1</span><span class="diary-top">传媒ETF +42.3</span><span class="diary-top">中概互联ETF +37.3</span></div><div class="diary-day"><b>06/26</b><span class="diary-top">传媒ETF +38.2</span><span class="diary-top">豆粕ETF +37.1</span><span class="diary-top">有色期货ETF +34.6</span></div><div class="diary-day"><b>06/25</b><span class="diary-top">钢铁ETF +41.8</span><span class="diary-top">传媒ETF +39.8</span><span class="diary-top">机床ETF +36.8</span></div><div class="diary-day"><b>06/24</b><span class="diary-top">游戏ETF +43.0</span><span class="diary-top">光伏ETF +39.0</span><span class="diary-top">钢铁ETF +37.0</span></div><div class="diary-day"><b>06/23</b><span class="diary-top">游戏ETF +43.0</span><span class="diary-top">钢铁ETF +39.8</span><span class="diary-top">光伏ETF +39.0</span></div></div>
+<div class="chlog-title">📋 信号变化日志 (vs 20260626)</div>
+<span class="chlog-name">酒ETF</span>
+<span class="chlog-detail">绿柱缩短, RSI32回弹, 长下影</span>
+<span class="chlog-name">传媒ETF</span>
+<span class="chlog-detail">MACD多头, RSI37回弹, 刚站上MA5</span>
+<span class="chlog-name">有色期货ETF</span>
+<span class="chlog-detail">绿柱缩短, RSI39回弹</span>
+<span class="chlog-name">家电ETF</span>
+<span class="chlog-detail">绿柱缩短, RSI42回弹, 刚站上MA5</span>
+<span class="chlog-name">农业ETF</span>
+<span class="chlog-detail">MACD多头, RSI40回弹</span>
+<span class="chlog-name">中概互联ETF</span>
+<span class="chlog-detail">布林超卖, RSI极低25</span>
+<span class="chlog-name">黄金ETF</span>
+<span class="chlog-name">黄金ETF</span>
+<span class="chlog-name">上海金ETF</span>
+<span class="chlog-name">电力ETF</span>
+<span class="chlog-name">食品饮料ETF</span>
+<span class="chlog-name">日经ETF</span>
+<span class="chlog-name">机床ETF</span>
+<span class="chlog-name">证券ETF</span>
+<span class="chlog-name">成长100ETF</span>
+<span class="chlog-name">日经225ETF</span>
+<span class="chlog-name">豆粕ETF</span>
+<span class="chlog-name">中证500ETF</span>
+<span class="chlog-detail">RSI过热73, 布林超买92%</span>
+<span class="chlog-name">中证1000ETF</span>
+<span class="chlog-name">A500ETF</span>
+<div class="chlog-box"><div class="chlog-title">🤖 自动更新状态</div>
+<div class="vp-kpis"><span>守护进程 <b class="pos">1个</b></span><span>最近运行 <b>20260630</b></span><span>缓存 <b>73只</b></span><span>计划 <b>工作日15:30</b></span></div>
+<p class="muted" style="margin-top:8px">[daemon] ⚡ 快速模式 Tue Jun 30 07:30:29 AM UTC 2026<br>timeout: failed to run command ‘https_proxy=http://127.0.0.1:2080’: No such file or directory<br>[daemon] 完成 Tue Jun 30 07:30:29 AM UTC 2026</p></div>
+<div class="footer">⚠️ 仅供量化研究，不构成投资建议。执行原则：先看大盘仓位，再看周线节奏，最后用日线买点进场；破止损必须离场。<br>IC>0.03有效 · 自适应权重动态调整 · 风险预算控制波动率≤15% · ATR×2.2止损。</div></div></main>
+<button onclick="manualRefresh()"><b>🔄</b>更新</button>
+const reportDate='20260630';
+function scrollToId(id){const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth',block:'start'});}
+ const q=(document.getElementById('q')?.value||'').toLowerCase();
+ document.querySelectorAll('tbody tr[data-action]').forEach(tr=>{
+   const name=(tr.dataset.name||'').toLowerCase();
+   if(currentFilter==='hideAvoid') ok=ok && !ex;
+ const tr=document.querySelector(`tr[data-code="${code}"]`);
+ let arr=[]; try{arr=JSON.parse(localStorage.getItem('manualHoldings')||'[]')}catch(e){}
+ const body=document.getElementById('manual-body'); if(!body) return;
+   if(price&&info.stop&&price<=info.stop){t1=(h.buyDate===todayIso)?'⚠️ 今日买入破止损，T+1明日处理':'❌ 已可卖：跌破止损';}
+ const code=(document.getElementById('mh-code').value||'').trim();
+ const name=(document.getElementById('mh-name').value||'').trim();
+ const cost=parseFloat(document.getElementById('mh-cost').value||0);
+ const qty=parseFloat(document.getElementById('mh-qty').value||0);
+ const buyDate=(document.getElementById('mh-date').value||'').trim();
+ let arr=[]; try{arr=JSON.parse(localStorage.getItem('manualHoldings')||'[]')}catch(e){}
+ const item={code,name,cost,qty,buyDate,ts:new Date().toISOString()};
+ localStorage.setItem('manualHoldings',JSON.stringify(arr));
+ loadManualHoldings();checkAlerts();
+function delManualHolding(i){let arr=JSON.parse(localStorage.getItem('manualHoldings')||'[]');arr.splice(i,1);localStorage.setItem('manualHoldings',JSON.stringify(arr));loadManualHoldings();checkAlerts();}
+function clearManualHoldings(){if(confirm('确定清空手动持仓？')){localStorage.removeItem('manualHoldings');loadManualHoldings();checkAlerts();}}
+function saveAlertConfig(){
+ ['bark-url','tg-bot','tg-chat','pushplus-token','serverchan-key','webhook-url','update-webhook-url','email-to'].forEach(id=>localStorage.setItem(id,document.getElementById(id)?.value||''));
+function loadAlertConfig(){
+ ['bark-url','tg-bot','tg-chat','pushplus-token','serverchan-key','webhook-url','update-webhook-url','email-to'].forEach(id=>{const el=document.getElementById(id); if(el) el.value=localStorage.getItem(id)||'';});
+async function sendBark(title,msg){const base=localStorage.getItem('bark-url')||''; if(!base) return; try{await fetch(base.replace(/\/$/,'')+'/'+encodeURIComponent(title)+'/'+encodeURIComponent(msg));}catch(e){}}
+async function sendTelegram(title,msg){const bot=localStorage.getItem('tg-bot')||'', chat=localStorage.getItem('tg-chat')||''; if(!bot||!chat) return; try{await fetch(`https://api.telegram.org/bot${bot}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chat,text:`${title}
+async function sendPushPlus(title,msg){const token=localStorage.getItem('pushplus-token')||''; if(!token) return; try{await fetch('https://www.pushplus.plus/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,title,content:msg,template:'txt'})});}catch(e){}}
+async function sendServerChan(title,msg){const key=localStorage.getItem('serverchan-key')||''; if(!key) return; try{await fetch(`https://sctapi.ftqq.com/${key}.send`,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:`title=${encodeURIComponent(title)}&desp=${encodeURIComponent(msg)}`});}catch(e){}}
+async function sendWebhook(title,msg){const url=localStorage.getItem('webhook-url')||''; if(!url) return; try{await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,msg,date:reportDate,source:'ETF雷达'})});}catch(e){}}
+function openMailDraft(title,msg){const to=localStorage.getItem('email-to')||''; if(!to) return; const k='mail_'+reportDate+'_'+title+'_'+msg.slice(0,20); if(localStorage.getItem(k)) return; localStorage.setItem(k,'1'); window.open(`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(msg)}`,'_blank');}
+async function sendAllPush(title,msg){sendBark(title,msg);sendTelegram(title,msg);sendPushPlus(title,msg);sendServerChan(title,msg);sendWebhook(title,msg);openMailDraft(title,msg);}
+function enableNotify(){if(!('Notification' in window)){alert('当前浏览器不支持通知');return;} Notification.requestPermission().then(p=>{document.getElementById('alert-status').innerText=p==='granted'?'已授权':'未授权';});}
+ const seenKey='alert_seen_'+reportDate+'_'+key; if(localStorage.getItem(seenKey)) return;
+ localStorage.setItem(seenKey,'1');
+ sendAllPush(title,msg);
+function checkAlerts(){
+ const buyRows=[...document.querySelectorAll('tr[data-action]')].filter(tr=>{const a=tr.dataset.action||'';return a.includes('强拐')||a.includes('关注');}).slice(0,5);
+ buyRows.forEach(tr=>{const code=tr.dataset.code, name=(tr.dataset.name||code).split(' ')[0], act=tr.dataset.action; list.push({type:'buy',key:'buy_'+code,title:'ETF可买信号',msg:`${name} ${code} ${act}`});});
+ let arr=[]; try{arr=JSON.parse(localStorage.getItem('manualHoldings')||'[]')}catch(e){}
+     if(h.buyDate===todayIso) list.push({type:'risk',key:'t1_stop_'+h.code,title:'T+1止损风险',msg:`${h.name||h.code} 今日买入已破止损，今天不能卖，明日开盘处理`});
+     else list.push({type:'risk',key:'stop_'+h.code,title:'持仓触及止损',msg:`${h.name||h.code} 当前${info.price.toFixed(3)} 止损${info.stop.toFixed(3)}，已可卖出`});
+   if(info.tp&&info.price>=info.tp) list.push({type:'risk',key:'tp_'+h.code,title:'持仓达到止盈',msg:`${h.name||h.code} 当前${info.price.toFixed(3)} 止盈${info.tp.toFixed(3)}`});
+   if((info.action||'').includes('排除')) list.push({type:'risk',key:'avoid_'+h.code,title:'持仓被系统排除',msg:`${h.name||h.code} 当前建议：${info.action}`});
+ const bc=document.getElementById('alert-buy-count'), rc=document.getElementById('alert-risk-count'), st=document.getElementById('alert-status'), al=document.getElementById('alert-list');
+ const st=document.getElementById('refresh-status');
+ set('正在触发更新...');
+ const hook=localStorage.getItem('update-webhook-url')||'';
+   try{await fetch(hook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source:'ETF雷达',action:'refresh',date:reportDate})}); fired=true; set('已触发Webhook，30秒后刷新...');}catch(e){set('Webhook触发失败，尝试本地刷新...');}
+ try{await fetch('http://localhost:8895/refresh',{mode:'no-cors'}); fired=true; if(!hook) set('已尝试触发本地更新，30秒后刷新...');}catch(e){}
+ if(!fired){set('未配置更新Webhook，仅刷新页面缓存...'); setTimeout(()=>{location.href=location.pathname+'?v='+Date.now();},800); return;}
+function testAlert(){notifyOnce('test_'+Date.now(),'ETF雷达测试提醒','如果你看到这条，提醒功能正常');alert('测试已触发；已配置的推送渠道也会发送。');}
+window.addEventListener('DOMContentLoaded',()=>{loadManualHoldings();loadAlertConfig();checkAlerts();});
