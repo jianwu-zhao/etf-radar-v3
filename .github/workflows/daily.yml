@@ -10,6 +10,12 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   run-strategy:
@@ -26,6 +32,9 @@ jobs:
       - name: Run ETF Radar V3
         run: python3 radar_strategy_v3.py --no-save
 
+      - name: Generate dashboard
+        run: python3 generate_dashboard.py
+
       - name: Upload reports
         uses: actions/upload-artifact@v4
         with:
@@ -33,12 +42,12 @@ jobs:
           path: reports/plan_v3_*.txt
           retention-days: 30
 
-      - name: Commit reports to repo
+      - name: Commit reports and pages to repo
         run: |
           git config user.name "ETF Bot"
           git config user.email "bot@etf-radar.com"
-          git add reports/
-          git diff --cached --quiet || git commit -m "daily: etf plan $(date +%Y%m%d)"
+          git add reports/ pages/
+          git diff --cached --quiet || git commit -m "daily: etf plan and dashboard $(date +%Y%m%d)"
           git push
 
       - name: Send Telegram notification
@@ -51,3 +60,19 @@ jobs:
           curl -s -X POST "https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage" \
             -H "Content-Type: application/json" \
             -d "{\"chat_id\":\"$TG_CHAT_ID\",\"text\":$TEXT,\"parse_mode\":\"Markdown\"}" || true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages/
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: run-strategy
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
