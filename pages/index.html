@@ -5,115 +5,151 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ETF 波段雷达 V3</title>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8; --up: #22c55e; --down: #ef4444; }
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --accent: #38bdf8;
+            --up: #ef4444;
+            --down: #22c55e;
+            --buy: #22c55e;
+            --watch: #f59e0b;
+            --confirm: #38bdf8;
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
-        .container { max-width: 900px; margin: 0 auto; }
-        h1 { text-align: center; margin-bottom: 8px; }
-        .sub { text-align: center; color: var(--muted); margin-bottom: 24px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
-        .card { background: var(--card); border-radius: 12px; padding: 16px; text-align: center; }
-        .card .label { color: var(--muted); font-size: 12px; }
-        .card .value { font-size: 22px; font-weight: bold; margin-top: 4px; }
-        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; }
-        th, td { padding: 12px; text-align: center; border-bottom: 1px solid #334155; }
-        th { background: #0f172a; color: var(--accent); font-weight: 600; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); padding: 16px; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 6px; font-size: 24px; }
+        .sub { text-align: center; color: var(--muted); margin-bottom: 20px; font-size: 13px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .card { background: var(--card); border-radius: 10px; padding: 14px; text-align: center; }
+        .card .label { color: var(--muted); font-size: 11px; }
+        .card .value { font-size: 20px; font-weight: bold; margin-top: 4px; }
+        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; font-size: 13px; }
+        th, td { padding: 10px 6px; text-align: center; border-bottom: 1px solid #334155; }
+        th { background: #0f172a; color: var(--accent); font-weight: 600; font-size: 12px; position: sticky; top: 0; }
         tr:hover { background: #334155; }
-        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .buy { background: #22c55e33; color: #4ade80; }
-        .watch { background: #f59e0b33; color: #fbbf24; }
-        .confirm { background: #38bdf833; color: #38bdf8; }
-        .footer { text-align: center; color: var(--muted); margin-top: 24px; font-size: 12px; }
-        .rules { background: var(--card); border-radius: 12px; padding: 16px; margin-top: 24px; }
-        .rules h3 { margin-bottom: 12px; color: var(--accent); }
-        .rules li { margin: 6px 0; color: var(--muted); }
+        td.name { text-align: left; }
+        td.plan { font-size: 11px; line-height: 1.6; }
+        td.sig { font-size: 11px; color: var(--muted); max-width: 120px; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .buy { background: rgba(34,197,94,0.15); color: var(--buy); }
+        .watch { background: rgba(245,158,11,0.15); color: var(--watch); }
+        .confirm { background: rgba(56,189,248,0.15); color: var(--confirm); }
+        .wait { background: rgba(148,163,184,0.15); color: var(--muted); }
+        .grade-s { background: rgba(239,68,68,0.2); color: #fca5a5; }
+        .grade-a { background: rgba(249,115,22,0.2); color: #fdba74; }
+        .grade-b { background: rgba(59,130,246,0.2); color: #93c5fd; }
+        .grade-c { background: rgba(148,163,184,0.2); color: #cbd5e1; }
+        .score { font-weight: bold; border-radius: 4px; padding: 2px 4px; display: inline-block; }
+        .up { color: var(--up); }
+        .down { color: var(--down); }
+        .footer { text-align: center; color: var(--muted); margin-top: 20px; font-size: 11px; }
+        .rules { background: var(--card); border-radius: 10px; padding: 14px; margin-top: 20px; font-size: 12px; }
+        .rules h3 { margin-bottom: 10px; color: var(--accent); }
+        .rules li { margin: 5px 0; color: var(--muted); }
+        @media (max-width: 768px) {
+            body { padding: 8px; font-size: 12px; }
+            th, td { padding: 6px 3px; }
+            td.sig, td.plan { font-size: 10px; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>📡 ETF 波段雷达 V3</h1>
-        <div class="sub">数据更新：20260702 · 数据源：东方财富 API</div>
+        <div class="sub">更新：20260702　大盘：偏多　建议仓位：80%　扫描：30只</div>
 
         <div class="grid">
-            <div class="card">
-                <div class="label">大盘状态</div>
-                <div class="value">偏多</div>
-            </div>
-            <div class="card">
-                <div class="label">目标仓位</div>
-                <div class="value">80%</div>
-            </div>
-            <div class="card">
-                <div class="label">ETF 仓位</div>
-                <div class="value">36.0%</div>
-            </div>
-            <div class="card">
-                <div class="label">现金</div>
-                <div class="value">64.0%</div>
-            </div>
-            <div class="card">
-                <div class="label">扫描标的</div>
-                <div class="value">30</div>
-            </div>
+            <div class="card"><div class="label">目标仓位</div><div class="value">80%</div></div>
+            <div class="card"><div class="label">ETF 仓位</div><div class="value">36.0%</div></div>
+            <div class="card"><div class="label">现金</div><div class="value">64.0%</div></div>
+            <div class="card"><div class="label">入选标的</div><div class="value">4</div></div>
         </div>
 
         <table>
             <thead>
                 <tr>
-                    <th>ETF</th>
-                    <th>动作</th>
-                    <th>评分</th>
-                    <th>RSI14</th>
-                    <th>仓位</th>
-                    <th>现价</th>
-                    <th>止损</th>
-                    <th>止盈</th>
+                    <th>序</th>
+                    <th>标的</th>
+                    <th>操作建议</th>
+                    <th>拐点信号</th>
+                    <th>V4评分</th>
+                    <th>MACD柱</th>
+                    <th>均值回归</th>
+                    <th>价格结构</th>
+                    <th>RSI/风控</th>
+                    <th>月线</th>
+                    <th>周线</th>
+                    <th>日线</th>
+                    <th>买点参考</th>
                 </tr>
             </thead>
             <tbody>
                 
         <tr>
-            <td><b>黄金华安</b><br><small>518880</small></td>
+            <td>1</td>
+            <td class="name"><b>黄金华安</b><br><small>518880</small></td>
             <td><span class="badge watch">超卖观察</span></td>
-            <td>50.0</td>
-            <td>30.4</td>
-            <td>8.0%</td>
-            <td>8.271</td>
-            <td>8.016</td>
-            <td>8.696</td>
+            <td class="sig">MACD绿柱 · RSI超卖 · 布林下轨 · 跌破MA5</td>
+            <td class="score grade-a">50.0</td>
+            <td>-0.0228</td>
+            <td>-12.1%</td>
+            <td>12.7%</td>
+            <td><b>RSI30</b><br><small>ATR0.170</small></td>
+            <td class="down">-17.5%</td>
+            <td class="down">-12.1%</td>
+            <td class="down">-1.28%</td>
+            <td class="plan">回踩 8.016<br>止盈 8.696<br>仓位 8.0%</td>
         </tr>
         
         <tr>
-            <td><b>红利华泰柏瑞</b><br><small>510880</small></td>
+            <td>2</td>
+            <td class="name"><b>红利华泰柏瑞</b><br><small>510880</small></td>
             <td><span class="badge confirm">确认买</span></td>
-            <td>50.0</td>
-            <td>30.6</td>
-            <td>14.3%</td>
-            <td>2.963</td>
-            <td>2.869</td>
-            <td>3.121</td>
+            <td class="sig">MACD绿柱 · RSI超卖 · 布林下轨 · 站上MA5</td>
+            <td class="score grade-a">50.0</td>
+            <td>-0.0273</td>
+            <td>-7.8%</td>
+            <td>14.8%</td>
+            <td><b>RSI31</b><br><small>ATR0.063</small></td>
+            <td class="down">-8.6%</td>
+            <td class="down">-10.4%</td>
+            <td class="up">+1.61%</td>
+            <td class="plan">回踩 2.869<br>止盈 3.121<br>仓位 14.3%</td>
         </tr>
         
         <tr>
-            <td><b>恒生华夏</b><br><small>159920</small></td>
+            <td>3</td>
+            <td class="name"><b>恒生华夏</b><br><small>159920</small></td>
             <td><span class="badge watch">超卖观察</span></td>
-            <td>50.0</td>
-            <td>32.6</td>
-            <td>8.0%</td>
-            <td>1.351</td>
-            <td>1.313</td>
-            <td>1.413</td>
+            <td class="sig">MACD绿柱 · RSI超卖 · 布林下轨 · 跌破MA5</td>
+            <td class="score grade-a">50.0</td>
+            <td>-0.0055</td>
+            <td>-9.2%</td>
+            <td>15.9%</td>
+            <td><b>RSI33</b><br><small>ATR0.025</small></td>
+            <td class="down">-10.3%</td>
+            <td class="down">-11.1%</td>
+            <td class="up">+0.30%</td>
+            <td class="plan">回踩 1.313<br>止盈 1.413<br>仓位 8.0%</td>
         </tr>
         
         <tr>
-            <td><b>银行华宝</b><br><small>512800</small></td>
+            <td>4</td>
+            <td class="name"><b>银行华宝</b><br><small>512800</small></td>
             <td><span class="badge watch">超卖观察</span></td>
-            <td>50.0</td>
-            <td>33.9</td>
-            <td>5.7%</td>
-            <td>0.737</td>
-            <td>0.712</td>
-            <td>0.779</td>
+            <td class="sig">MACD绿柱 · RSI超卖 · 布林下轨 · 跌破MA5</td>
+            <td class="score grade-a">50.0</td>
+            <td>-0.0056</td>
+            <td>-6.0%</td>
+            <td>7.1%</td>
+            <td><b>RSI34</b><br><small>ATR0.017</small></td>
+            <td class="down">-8.1%</td>
+            <td class="down">-6.7%</td>
+            <td class="up">+0.41%</td>
+            <td class="plan">回踩 0.712<br>止盈 0.779<br>仓位 5.7%</td>
         </tr>
         
             </tbody>
@@ -132,7 +168,7 @@
 
         <div class="footer">
             本工具仅做策略信号计算，不构成投资建议，不自动下单。<br>
-            Generated at 2026-07-01 17:04:00
+            数据源：东方财富 API · 生成时间 2026-07-02 02:22:22
         </div>
     </div>
 </body>
