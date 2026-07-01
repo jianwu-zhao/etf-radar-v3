@@ -25,6 +25,9 @@ from typing import List, Dict, Any
 
 from data_source import realtime_quote, daily_kline, fetch_etf_list
 from tech_indicators import analyze
+from datetime import timezone, timedelta
+
+BEIJING_TZ = timezone(timedelta(hours=8))
 
 HOME = os.path.expanduser("~")
 BASE = os.path.join(HOME, "etf-radar")
@@ -290,7 +293,7 @@ def select_portfolio(analyzed: List[Dict], target_pos: float, top_n=6):
 
 
 def build_report(market_regime, target_pos, selected, analyzed_count):
-    today = datetime.datetime.now().strftime("%Y%m%d")
+    today = datetime.datetime.now(BEIJING_TZ).strftime("%Y%m%d")
     etf_sum = round(sum(x["weight"] for x in selected), 4)
     cash = round(max(0.0, 1 - etf_sum), 4)
 
@@ -327,7 +330,7 @@ def build_report(market_regime, target_pos, selected, analyzed_count):
 
     text = "\n".join(lines)
     data = {
-        "generated_at": datetime.datetime.now().isoformat(),
+        "generated_at": datetime.datetime.now(BEIJING_TZ).isoformat(),
         "date": today,
         "market_regime": market_regime,
         "target_position": target_pos,
