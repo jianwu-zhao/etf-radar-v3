@@ -51,8 +51,9 @@ jobs:
           git config user.email "bot@etf-radar.com"
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           git add reports/ pages/
-          git diff --cached --quiet || git commit -m "daily: etf plan and dashboard $(date +%Y%m%d)"
-          git push || echo "commit push skipped"
+          git status
+          git diff --cached --quiet || (git commit -m "daily: etf plan and dashboard $(date +%Y%m%d)" && git push)
+          echo "commit done"
 
       - name: Send Telegram notification
         continue-on-error: true
