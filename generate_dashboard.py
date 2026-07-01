@@ -10,7 +10,7 @@ import datetime
 
 
 def load_latest_plan():
-    files = sorted(glob.glob("reports/plan_v3_*.json"), reverse=True)
+    files = sorted(glob.glob("reports/plan_v3_1_*.json"), reverse=True)
     if not files:
         return None
     with open(files[0], encoding="utf-8") as f:
@@ -81,7 +81,7 @@ def generate(data):
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ETF 波段雷达 V3</title>
+    <title>ETF 波段雷达 V3.1</title>
     <style>
         :root {{
             --bg: #0f172a;
@@ -136,7 +136,7 @@ def generate(data):
 </head>
 <body>
     <div class="container">
-        <h1>📡 ETF 波段雷达 V3</h1>
+        <h1>📡 ETF 波段雷达 V3.1</h1>
         <div class="sub">更新：{date}　大盘：{market}　建议仓位：{target*100:.0f}%　扫描：{scanned}只</div>
 
         <div class="grid">

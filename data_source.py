@@ -11,10 +11,18 @@ from datetime import datetime
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 
 
-def _request(url, timeout=15):
+def _request(url, timeout=15, retries=3):
+    import time
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(req, timeout=timeout) as f:
-        return json.loads(f.read().decode())
+    for i in range(retries):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as f:
+                return json.loads(f.read().decode())
+        except Exception as e:
+            if i == retries - 1:
+                raise
+            time.sleep(1 + i)
+    return None
 
 
 def _price(v):
