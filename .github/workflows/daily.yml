@@ -43,14 +43,19 @@ jobs:
           retention-days: 30
 
       - name: Commit reports and pages to repo
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "ETF Bot"
           git config user.email "bot@etf-radar.com"
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           git add reports/ pages/
           git diff --cached --quiet || git commit -m "daily: etf plan and dashboard $(date +%Y%m%d)"
-          git push
+          git push || echo "commit push skipped"
 
       - name: Send Telegram notification
+        continue-on-error: true
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
