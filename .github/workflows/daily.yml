@@ -57,7 +57,7 @@ jobs:
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           git add reports/ pages/
           git status
-          git diff --cached --quiet || (git commit -m "daily: etf plan and dashboard $(date +%Y%m%d)" && git push)
+          git diff --cached --quiet || (git commit -m "daily: etf plan and dashboard $(TZ=Asia/Shanghai date +%Y%m%d)" && git push)
           echo "commit done"
 
       - name: Send Telegram notification
