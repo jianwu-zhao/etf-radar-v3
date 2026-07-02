@@ -43,6 +43,7 @@ def action_class(action):
 
 
 def generate(data):
+    version = data.get("version", "V3.1")
     date = data.get("date", "")
     market = data.get("market_regime", "未知")
     target = data.get("target_position", 0)
@@ -51,17 +52,30 @@ def generate(data):
     cash = data.get("cash", 0)
     scanned = data.get("all_scanned", 0)
 
+    # 从 positions 提取行业信息
+    sec_names = {}
+    for p in positions:
+        sec = p.get("sector", "") or p.get("industry", "")
+        if sec:
+            sec_names[p.get("code","")] = sec
+
     # 生成选中池表格
     selected_rows = []
     for i, p in enumerate(positions, 1):
         bb = p.get("bollinger", {})
         macd = p.get("macd", {})
         ma60_dist = (p.get("price", 0) / p.get("ma60", 1) - 1) * 100 if p.get("ma60") else 0
+        sec = p.get("sector", "") or p.get("industry", "") or ""
+        intra_15m = p.get("intraday_signal", "") or p.get("signal_15m", "")
+        if intra_15m == "unknown":
+            intra_15m = ""
         selected_rows.append(f"""
         <tr>
             <td>{i}</td>
             <td class="name"><b>{html_escape(p.get('name',''))}</b><br><small>{p.get('code','')}</small></td>
+            <td class="name"><small>{html_escape(sec)}</small></td>
             <td><span class="badge {action_class(p.get('action',''))}">{p.get('action','')}</span></td>
+            <td class="sig">{html_escape(intra_15m)}</td>
             <td class="sig">{format_signal(p)}</td>
             <td class="score {grade_class(p.get('score',0))}">{p.get('score',0):.1f}</td>
             <td>{macd.get('histogram',0):.4f}</td>
@@ -75,18 +89,73 @@ def generate(data):
         </tr>
         """)
 
-    selected_html = "".join(selected_rows) if selected_rows else "<tr><td colspan='13'>暂无入选</td></tr>"
+    selected_html = "".join(selected_rows) if selected_rows else "<tr><td colspan='15'>暂无入选</td></tr>"
 
     # 行业轮动
     sec_scores = sector_scores(data.get("positions", []), CORE_SECTOR_MAP)
     sec_html = " | ".join([f"<span class=\"badge wait\">{s}:{v['score']:.1f}</span>" for s, v in sorted(sec_scores.items(), key=lambda x: x[1]['score'], reverse=True)])
+
+    # 使用指南
+    guide = fr"""
+    <details class="guide">
+        <summary>📖 如何使用本页面（点击展开）</summary>
+        <div class="guide-content">
+            <div class="guide-section">
+                <h4>🎯 核心用法</h4>
+                <p>每天看 <b>操作建议</b> 列，按以下规则执行：</p>
+                <table class="guide-table">
+                    <tr><th>信号</th><th>含义</th><th>操作</th></tr>
+                    <tr><td><span class="badge buy">可买</span></td><td>评分达标，可以买入</td><td>次日开盘涨幅 ≤ 1.5% 直接建仓</td></tr>
+                    <tr><td><span class="badge confirm">确认买</span></td><td>条件强于可买，等待确认</td><td>突破昨高或站上 MA5 才买</td></tr>
+                    <tr><td><span class="badge watch">超卖观察</span></td><td>已经跌多了，可能反弹</td><td>每跌 2% 加一次，分批建仓</td></tr>
+                    <tr><td><span class="badge wait">等待</span></td><td>评分不够</td><td>不动，等下次入选</td></tr>
+                </table>
+            </div>
+            <div class="guide-section">
+                <h4>📊 各列解读</h4>
+                <ul>
+                    <li><b>序</b>：排名序号</li>
+                    <li><b>标的</b>：ETF 名称 + 代码</li>
+                    <li><b>行业</b>：所属行业（顶部行业轮动条显示最强行业）</li>
+                    <li><b>操作建议</b>：<span class="badge buy">可买</span>/<span class="badge confirm">确认买</span>/<span class="badge watch">超卖观察</span>/<span class="badge wait">等待</span></li>
+                    <li><b>15m</b>：15 分钟级别信号（buy_pullback/buy_breakout/overbought/neutral），辅助判断是否今天追</li>
+                    <li><b>V4评分</b>：S(≥60)/A(50-59)/B(40-49)/C(<40)，S 最强</li>
+                    <li><b>MACD柱</b>：+红柱上涨动能，-绿柱下跌动能</li>
+                    <li><b>均值回归</b>：当前价偏离 MA60 的百分比</li>
+                    <li><b>价格结构</b>：布林带 %B 位置，<20 下轨，>80 上轨</li>
+                    <li><b>RSI/风控</b>：RSI14 + ATR14 波动率</li>
+                    <li><b>月/周/日线</b>：对应周期涨跌幅</li>
+                    <li><b>买点参考</b>：<span style="color:var(--down)">回踩价</span>（止损）和 <span style="color:var(--up)">止盈价</span>，仓位占比</li>
+                </ul>
+            </div>
+            <div class="guide-section">
+                <h4>⚠️ 风控规则</h4>
+                <ul>
+                    <li>单只 ETF 仓位上限 20%</li>
+                    <li>止损：收盘价 ≤ 止损价 → 次日清仓</li>
+                    <li>止盈：≥ 止盈价卖 50%，剩余保本移动止盈</li>
+                    <li>大盘强多 → 95% 仓位；中性 → 50%；强空 → 10%</li>
+                    <li>本工具仅做策略信号计算，<b>不构成投资建议，不自动下单</b></li>
+                </ul>
+            </div>
+            <div class="guide-section">
+                <h4>🔄 自动运行</h4>
+                <ul>
+                    <li>GitHub Actions 每天 15:30（北京时间）自动跑一次</li>
+                    <li>页面自动更新</li>
+                    <li>配置 Telegram bot 可收到每日推送</li>
+                </ul>
+            </div>
+        </div>
+    </details>
+    """
 
     html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ETF 波段雷达 V3.1</title>
+    <title>ETF 波段雷达 {html_escape(version)}</title>
     <style>
         :root {{
             --bg: #0f172a;
@@ -129,6 +198,17 @@ def generate(data):
         .up {{ color: var(--up); }}
         .down {{ color: var(--down); }}
         .footer {{ text-align: center; color: var(--muted); margin-top: 20px; font-size: 11px; }}
+        .guide {{ background: var(--card); border-radius: 10px; margin-bottom: 20px; overflow: hidden; font-size: 13px; }}
+        .guide summary {{ padding: 14px; cursor: pointer; color: var(--accent); font-weight: 600; font-size: 15px; }}
+        .guide-content {{ padding: 0 14px 14px; }}
+        .guide-section {{ margin-bottom: 14px; }}
+        .guide-section h4 {{ color: var(--accent); margin-bottom: 6px; font-size: 13px; }}
+        .guide-section p, .guide-section li {{ color: var(--muted); line-height: 1.7; font-size: 12px; }}
+        .guide-section ul {{ padding-left: 18px; }}
+        .guide-table {{ width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 12px; }}
+        .guide-table th {{ background: #0f172a; color: var(--accent); padding: 6px 8px; text-align: left; font-size: 12px; }}
+        .guide-table td {{ padding: 6px 8px; border-bottom: 1px solid #334155; text-align: left; color: var(--muted); }}
+        .guide-table tr:hover {{ background: #334155; }}
         .rules {{ background: var(--card); border-radius: 10px; padding: 14px; margin-top: 20px; font-size: 12px; }}
         .rules h3 {{ margin-bottom: 10px; color: var(--accent); }}
         .rules li {{ margin: 5px 0; color: var(--muted); }}
@@ -141,8 +221,10 @@ def generate(data):
 </head>
 <body>
     <div class="container">
-        <h1>📡 ETF 波段雷达 V3.1</h1>
+        <h1>📡 ETF 波段雷达 {html_escape(version)}</h1>
         <div class="sub">更新：{date}　大盘：{market}　建议仓位：{target*100:.0f}%　扫描：{scanned}只</div>
+
+        {guide}
 
         <div class="grid">
             <div class="card"><div class="label">目标仓位</div><div class="value">{target*100:.0f}%</div></div>
@@ -159,11 +241,12 @@ def generate(data):
                     <th>行业</th>
                     <th>操作建议</th>
                     <th>15m</th>
+                    <th>拐点信号</th>
                     <th>V4评分</th>
                     <th>MACD柱</th>
                     <th>均值回归</th>
                     <th>价格结构</th>
-                    <th>RSI/风控</th>
+                    <th>RSI风控</th>
                     <th>月线</th>
                     <th>周线</th>
                     <th>日线</th>
