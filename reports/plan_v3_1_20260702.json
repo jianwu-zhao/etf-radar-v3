@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T21:06:56.016498+08:00",
+  "generated_at": "2026-07-02T21:52:44.450444+08:00",
   "date": "20260702",
   "market_regime": "强多",
   "target_position": 0.95,
@@ -36,15 +36,15 @@
       },
       "atr14": 0.189,
       "score": 78,
-      "action": "可买",
+      "action": "确认买",
       "stop": 1.314,
       "take_profit": 1.98,
       "theme": "其他",
       "sector": "芯片",
       "weight": 0.2,
-      "intra_signal": "unknown",
-      "intra_rsi14": null,
-      "intra_macd_hist": 0
+      "intra_signal": "buy_pullback",
+      "intra_rsi14": 29.75,
+      "intra_macd_hist": -0.0044
     },
     {
       "code": "159995",
@@ -82,9 +82,9 @@
       "theme": "其他",
       "sector": "芯片",
       "weight": 0.2,
-      "intra_signal": "unknown",
-      "intra_rsi14": null,
-      "intra_macd_hist": 0
+      "intra_signal": "neutral",
+      "intra_rsi14": 28.94,
+      "intra_macd_hist": -0.0101
     },
     {
       "code": "588000",
@@ -116,15 +116,15 @@
       },
       "atr14": 0.265,
       "score": 68,
-      "action": "可买",
+      "action": "确认买",
       "stop": 1.973,
       "take_profit": 2.916,
       "theme": "宽基",
       "sector": "宽基",
       "weight": 0.2,
-      "intra_signal": "unknown",
-      "intra_rsi14": null,
-      "intra_macd_hist": 0
+      "intra_signal": "buy_pullback",
+      "intra_rsi14": 30.65,
+      "intra_macd_hist": -0.0069
     },
     {
       "code": "515790",
