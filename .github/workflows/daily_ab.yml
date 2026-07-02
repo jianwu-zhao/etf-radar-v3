@@ -32,9 +32,10 @@ jobs:
           DATE=$(TZ=Asia/Shanghai date +%Y%m%d)
           echo "DATE=$DATE"
           ls -la reports/plan_v3_*_${DATE}.*
-          python3 generate_dashboard.py --plan reports/plan_v3_1_${DATE}.json --output pages/index.html
-          python3 generate_dashboard.py --plan reports/plan_v3_2_${DATE}.json --output pages/index_v3_2.html
-          ls -la pages/
+          python3 generate_dashboard.py --plan reports/plan_v3_1_${DATE}.json --output pages/index.html 2>&1 | tee -a reports/dashboard.log
+          python3 generate_dashboard.py --plan reports/plan_v3_2_${DATE}.json --output pages/index_v3_2.html 2>&1 | tee -a reports/dashboard.log
+          ls -la pages/ >> reports/dashboard.log
+          cat reports/dashboard.log
       - name: Commit plans
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -48,7 +49,6 @@ jobs:
             git add reports/ pages/ data_cache/
             git status --short
             git diff --cached --quiet || git commit -m "A/B: daily plans $(TZ=Asia/Shanghai date +%Y%m%d)"
-            git pull --no-rebase origin main || echo "pull failed"
             git push
           } 2>&1 | tee reports/commit.log
       - name: Upload artifacts
