@@ -110,12 +110,18 @@ def relative_strength(code, klines, base_k=None):
 
 
 def factor_score(ind: Dict, rt: Dict, regime: str) -> float:
-    """多因子评分，市场自适应"""
+    """多因子评分，市场自适应（增强版：R²质量过滤 + MA Energy + 乖离率回归）"""
     params = REGIME_PARAMS.get(regime, REGIME_PARAMS["中性"])
     momentum_mode = params["momentum"]
     score = 0
 
-    # 1. 趋势因子 (0-25)
+    # === 新指标提取 ===
+    mq_r2 = ind.get("momentum_quality_r2", 0) or 0       # R² 趋势质量
+    mq_score = ind.get("momentum_quality_score", 0) or 0  # R² 动量质量分
+    me_total = ind.get("ma_energy_total", 0) or 0         # MA Energy 综合
+    bias_score = ind.get("bias_regression_score", 0) or 0  # 乖离率回归评分
+
+    # 1. 趋势因子 (0-25) + MA Energy 增强
     if ind["ma5"] > ind["ma10"] > ind["ma20"] > ind["ma60"]:
         score += 25
     elif ind["ma5"] > ind["ma20"] > ind["ma60"]:
@@ -125,37 +131,60 @@ def factor_score(ind: Dict, rt: Dict, regime: str) -> float:
     elif ind["price"] > ind["ma60"]:
         score += 5
 
-    # 2. 动量因子 (0-20)，根据市场状态调整
+    # MA Energy 增强：多周期均线偏离加分
+    if me_total > 5:
+        score += 8
+    elif me_total > 2:
+        score += 4
+    elif me_total < -5:
+        score -= 6
+    elif me_total < -2:
+        score -= 3
+
+    # 2. 动量因子 (0-20)，根据市场状态调整，加入R²质量过滤
     mom20 = ind.get("momentum_20") or 0
     mom60 = ind.get("momentum_60") or 0
+
+    # 基础动量分
+    base_mom = 0
     if momentum_mode == "strong":
         if mom20 > 15:
-            score += 20
+            base_mom = 20
         elif mom20 > 8:
-            score += 15
+            base_mom = 15
         elif mom20 > 0:
-            score += 8
+            base_mom = 8
         elif mom20 > -5:
-            score += 3
+            base_mom = 3
     elif momentum_mode == "reversal":
         if -15 < mom20 < -5:
-            score += 15
+            base_mom = 15
         elif mom20 < -15:
-            score += 10
+            base_mom = 10
         elif 0 < mom20 < 10:
-            score += 8
+            base_mom = 8
     else:  # balanced
         if 3 < mom20 < 15:
-            score += 18
+            base_mom = 18
         elif 0 < mom20 < 20:
-            score += 12
+            base_mom = 12
         elif -10 < mom20 < 0:
-            score += 6
+            base_mom = 6
 
-    # 60日动量加分
-    if mom60 > 10:
+    # R² 质量过滤：根据趋势质量折扣动量分
+    if mq_r2 >= 0.7:
+        score += int(base_mom * 1.0)  # 高质量趋势，全额
+    elif mq_r2 >= 0.5:
+        score += int(base_mom * 0.8)  # 中等质量，8折
+    elif mq_r2 >= 0.3:
+        score += int(base_mom * 0.5)  # 低质量，5折
+    else:
+        score += int(base_mom * 0.25)  # 噪声，2.5折
+
+    # 60日动量加分（也受R²影响）
+    if mom60 > 10 and mq_r2 >= 0.5:
         score += 5
-    elif mom60 > 0:
+    elif mom60 > 0 and mq_r2 >= 0.3:
         score += 2
 
     # 3. 反转因子 (0-15)
@@ -173,7 +202,6 @@ def factor_score(ind: Dict, rt: Dict, regime: str) -> float:
 
     # 4. 成交量因子 (0-10)
     vol_now = ind.get("volume", 0)
-    # volume 需要在 analyze 返回里加上
     if "volume" in ind and ind["volume"]:
         pass
 
@@ -193,8 +221,8 @@ def factor_score(ind: Dict, rt: Dict, regime: str) -> float:
         score += 10
     elif macd.get("histogram", 0) > 0:
         score += 6
-    elif macd.get("histogram", 0) > macd.get("histogram", 0) - 0.001:  # 绿柱缩短
-        score += 3
+    elif macd.get("histogram", 0) < 0 and macd.get("histogram", 0) > (ind.get("prev_macd_hist", -999) or -999):
+        score += 3  # 绿柱缩短
 
     # 7. 均值回归 (0-10)
     ma60_dist = (ind["price"] / ind["ma60"] - 1) * 100 if ind["ma60"] else 0
@@ -202,6 +230,17 @@ def factor_score(ind: Dict, rt: Dict, regime: str) -> float:
         score += 10
     elif ma60_dist < -5:
         score += 5
+
+    # 8. 乖离率回归动量 (0-10) - 新增
+    # 衡量价格偏离 MA60 的加速度方向
+    if bias_score > 0.5:
+        score += 10
+    elif bias_score > 0.1:
+        score += 6
+    elif bias_score < -0.5:
+        score -= 8
+    elif bias_score < -0.1:
+        score -= 3
 
     return max(0, min(100, score))
 
@@ -243,9 +282,32 @@ def signal_action(ind: Dict, score: float, regime: str) -> str:
 def calc_stop_take(ind: Dict) -> (float, float):
     atr = ind.get("atr14") or 0.03
     price = ind["price"]
-    # 趋势强时用更宽的止损
-    stop = round(max(price * 0.93, price - 2.0 * atr), 3)
-    take = round(price + 3.0 * atr, 3)
+    mq_r2 = ind.get("momentum_quality_r2", 0) or 0
+    me_total = ind.get("ma_energy_total", 0) or 0
+    bias_score = ind.get("bias_regression_score", 0) or 0
+
+    # 自适应止损倍数：趋势质量越高，止盈止损越宽（信任趋势）
+    if mq_r2 >= 0.7:
+        stop_mult, take_mult = 2.4, 4.5
+    elif mq_r2 >= 0.5:
+        stop_mult, take_mult = 2.2, 4.0
+    elif mq_r2 >= 0.3:
+        stop_mult, take_mult = 2.0, 3.5
+    else:
+        stop_mult, take_mult = 1.8, 3.0  # 低质量趋势，收紧
+
+    # MA Energy 增强：多头趋势强时扩大止盈
+    if me_total > 8:
+        take_mult += 1.0
+    elif me_total > 3:
+        take_mult += 0.5
+
+    # 乖离率回归：价格加速离开均线，提高止盈
+    if bias_score > 0.3:
+        take_mult += 0.5
+
+    stop = round(max(price * (1 - 0.06 - 0.01 * stop_mult), price - stop_mult * atr), 3)
+    take = round(price + take_mult * atr, 3)
     return stop, take
 
 
