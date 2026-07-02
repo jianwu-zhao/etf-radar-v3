@@ -232,16 +232,26 @@ def format_signal(p):
 
 
 def main():
-    data = load_latest_plan()
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--plan", default=None, help="指定 plan json 文件")
+    ap.add_argument("--output", default="pages/index.html", help="输出 html")
+    args = ap.parse_args()
+
+    if args.plan:
+        with open(args.plan, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    else:
+        data = load_latest_plan()
     if not data:
-        print("未找到 plan_v3_*.json")
+        print("未找到 plan json")
         return
 
-    os.makedirs("pages", exist_ok=True)
+    os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
     html = generate(data)
-    with open("pages/index.html", "w", encoding="utf-8") as f:
+    with open(args.output, "w", encoding="utf-8") as f:
         f.write(html)
-    print("已生成 pages/index.html")
+    print(f"已生成 {args.output}")
 
 
 if __name__ == "__main__":
