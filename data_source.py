@@ -221,7 +221,13 @@ def _batch_from_yahoo(codes, limit=500):
         return {code: _YAHOO_CACHE[code][-limit:] for code in codes}
     try:
         print(f"批量下载 Yahoo: {len(symbols)} 只")
+        import signal
+        def timeout_handler(signum, frame):
+            raise TimeoutError("Yahoo batch download timeout")
+        signal.signal(signal.SIGALRM, timeout_handler)
+        signal.alarm(300)  # 5 分钟超时
         df = yf.download(symbols, period="2y", group_by="ticker", progress=False, threads=True)
+        signal.alarm(0)
         if df is None or df.empty:
             return {}
         if len(symbols) == 1:

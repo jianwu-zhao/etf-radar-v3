@@ -20,7 +20,11 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
       - name: Preload data
-        run: python3 preload_data.py
+        run: |
+          set -x
+          python3 preload_data.py 2>&1 | tee reports/preload.log
+          ls -la data_cache/
+          wc -c data_cache/yahoo_cache.json
       - name: Run V3.1
         run: python3 radar_strategy_v3_1.py 2>&1 | tee reports/daily_v3_1.log
       - name: Run V3.2
@@ -36,7 +40,7 @@ jobs:
           git config user.name "ETF Bot"
           git config user.email "bot@etf-radar.com"
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
-          git add reports/ pages/
+          git add reports/ pages/ data_cache/
           git diff --cached --quiet || git commit -m "A/B: daily plans $(TZ=Asia/Shanghai date +%Y%m%d)"
           git push || echo "push skipped"
       - name: Upload artifacts
@@ -44,4 +48,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ab-logs
-          path: reports/daily_v3_*.log
+          path: reports/*.log
