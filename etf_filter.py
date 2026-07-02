@@ -117,6 +117,12 @@ def export_universe(filename="etf_universe.py", min_amount=3_000_000, max_etfs=1
         f.write("EXPANDED_ETF = [\n")
         for code in codes:
             f.write(f'    "{code}",\n')
+        f.write("]\n\n")
+        top50 = codes[:50]
+        f.write(f"# 扩展 ETF 池 Top 50（共 {len(top50)} 只）\n")
+        f.write("EXPANDED_ETF_TOP50 = [\n")
+        for code in top50:
+            f.write(f'    "{code}",\n')
         f.write("]\n")
 
     import os
