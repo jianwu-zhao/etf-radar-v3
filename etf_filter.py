@@ -156,4 +156,4 @@ if __name__ == "__main__":
     print("\n前20:")
     for e in etfs[:20]:
         print(f"  {e['code']} {e['name']} 主题:{e['theme']} 历史:{e['history_days']}天 成交额:{e.get('amount',0):.0f}")
-    export_universe()
+    export_universe(min_amount=5_000_000, min_history_days=250, max_etfs=150)

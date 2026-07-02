@@ -23,6 +23,8 @@ jobs:
           pip install -r requirements.txt
       - name: Update ETF universe
         run: python3 etf_filter.py
+        env:
+          PYTHONUNBUFFERED: 1
       - name: Commit updated universe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
