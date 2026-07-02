@@ -10,7 +10,7 @@ import argparse
 from collections import defaultdict
 
 from data_source import daily_kline
-from etf_universe import EXPANDED_ETF
+from etf_universe import EXPANDED_ETF, EXPANDED_ETF_TOP50
 from sector_map import CORE_SECTOR_MAP, sector_of
 from tech_indicators import analyze
 
