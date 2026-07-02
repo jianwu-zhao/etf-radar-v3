@@ -2,7 +2,6 @@ name: Update ETF Universe
 
 on:
   schedule:
-    # 每月 1 号北京时间 9:00 = UTC 01:00
     - cron: '0 1 1 * *'
   workflow_dispatch:
 
@@ -22,9 +21,10 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
       - name: Update ETF universe
-        run: python3 etf_filter.py
         env:
           PYTHONUNBUFFERED: 1
+        run: |
+          python3 etf_filter.py 2>&1 | tee reports/universe_filter_console.log
       - name: Commit updated universe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -32,6 +32,6 @@ jobs:
           git config user.name "ETF Bot"
           git config user.email "bot@etf-radar.com"
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
-          git add etf_universe.py
+          git add etf_universe.py reports/universe_filter*.log
           git diff --cached --quiet || git commit -m "update: etf universe $(date +%Y%m%d)"
           git push || echo "push skipped"

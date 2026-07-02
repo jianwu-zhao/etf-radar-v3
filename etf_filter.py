@@ -4,6 +4,7 @@
 ETF 筛选器：两步筛选，先按成交额/名称过滤，再检查历史数据
 """
 import re
+import datetime
 from collections import defaultdict
 from data_source import fetch_etf_list, daily_kline
 
@@ -137,8 +138,8 @@ def filter_etfs(min_amount=10_000_000, min_history_days=300, max_etfs=120, verbo
     return final
 
 
-def export_universe(filename="etf_universe.py", min_amount=10_000_000, min_history_days=300, max_etfs=120):
-    etfs = filter_etfs(min_amount=min_amount, min_history_days=min_history_days, max_etfs=max_etfs, verbose=False)
+def export_universe(filename="etf_universe.py", min_amount=10_000_000, min_history_days=300, max_etfs=120, log_file="reports/universe_filter.log"):
+    etfs = filter_etfs(min_amount=min_amount, min_history_days=min_history_days, max_etfs=max_etfs, verbose=True)
     codes = [e["code"] for e in etfs]
     with open(filename, "w", encoding="utf-8") as f:
         f.write("# -*- coding: utf-8 -*-\n")
@@ -147,7 +148,21 @@ def export_universe(filename="etf_universe.py", min_amount=10_000_000, min_histo
         for code in codes:
             f.write(f'    "{code}",\n')
         f.write("]\n")
+    
+    # 写日志
+    import os
+    os.makedirs(os.path.dirname(log_file) or ".", exist_ok=True)
+    with open(log_file, "w", encoding="utf-8") as f:
+        f.write(f"# ETF 筛选日志 {datetime.datetime.now()}\n")
+        f.write(f"min_amount={min_amount}, min_history_days={min_history_days}, max_etfs={max_etfs}\n")
+        f.write(f"导出数量: {len(codes)}\n\n")
+        f.write("code|name|theme|history_days|amount\n")
+        f.write("---|---|---|---|---\n")
+        for e in etfs:
+            f.write(f"{e['code']}|{e['name']}|{e.get('theme','')}|{e.get('history_days',0)}|{e.get('amount',0):.0f}\n")
+    
     print(f"已导出 {filename}，共 {len(codes)} 只")
+    print(f"日志已保存 {log_file}")
     return etfs
 
 
