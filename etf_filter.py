@@ -152,8 +152,10 @@ def export_universe(filename="etf_universe.py", min_amount=10_000_000, min_histo
 
 
 if __name__ == "__main__":
-    etfs = filter_etfs(min_amount=10_000_000, min_history_days=300, max_etfs=120)
+    etfs = filter_etfs(min_amount=5_000_000, min_history_days=250, max_etfs=150, verbose=True)
     print("\n前20:")
     for e in etfs[:20]:
         print(f"  {e['code']} {e['name']} 主题:{e['theme']} 历史:{e['history_days']}天 成交额:{e.get('amount',0):.0f}")
+    etfs = filter_etfs(min_amount=5_000_000, min_history_days=250, max_etfs=150, verbose=True)
+    print(f"\n最终导出 {len(etfs)} 只\n")
     export_universe(min_amount=5_000_000, min_history_days=250, max_etfs=150)
