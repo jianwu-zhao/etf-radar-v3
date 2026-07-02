@@ -391,8 +391,11 @@ def select_portfolio(analyzed: List[Dict], target_pos: float, top_n=6, top_secto
     return selected
 
 
-def build_report(market_regime, target_pos, selected, analyzed_count):
-    today = datetime.datetime.now(BEIJING_TZ).strftime("%Y%m%d")
+def build_report(market_regime, target_pos, selected, analyzed_count, data_date=None):
+    if data_date:
+        today = data_date
+    else:
+        today = datetime.datetime.now(BEIJING_TZ).strftime("%Y%m%d")
     etf_sum = round(sum(x["weight"] for x in selected), 4)
     cash = round(max(0.0, 1 - etf_sum), 4)
 
@@ -483,8 +486,18 @@ def main():
             analyzed.append(r)
             log(f"  {r['code']} {r['name']}: score={r['score']:.1f} action={r['action']} rsi={r['rsi14']} rs={r.get('relative_strength',0):+.1f}")
 
+    # 从数据源获取实际交易日期
+    data_date = None
+    if base_k and len(base_k) > 0:
+        data_date = base_k[-1].get("date", "")
+    if not data_date and analyzed:
+        # 从第一个分析的ETF获取日期
+        k = daily_kline(analyzed[0]["code"], limit=1)
+        if k:
+            data_date = k[-1].get("date", "")
+
     selected = select_portfolio(analyzed, target_pos, top_n=args.top)
-    report, data = build_report(market_regime, target_pos, selected, len(analyzed))
+    report, data = build_report(market_regime, target_pos, selected, len(analyzed), data_date=data_date)
 
     print("\n" + report)
 
