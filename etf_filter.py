@@ -108,7 +108,7 @@ def filter_etfs(min_amount=5_000_000, max_etfs=150):
     return final
 
 
-def export_universe(filename="etf_universe.py", min_amount=3_000_000, max_etfs=200, log_file="reports/universe_filter.log"):
+def export_universe(filename="etf_universe.py", min_amount=3_000_000, max_etfs=150, log_file="reports/universe_filter.log"):
     etfs = filter_etfs(min_amount=min_amount, max_etfs=max_etfs)
     codes = [e["code"] for e in etfs]
     with open(filename, "w", encoding="utf-8") as f:
