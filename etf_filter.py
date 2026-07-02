@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-ETF 筛选器：两步筛选，先按成交额/名称过滤，再检查历史数据
+ETF 筛选器：基于 akshare 实时数据快速筛选，不拉取历史 K 线
 """
-import re
 import datetime
 from collections import defaultdict
-from data_source import fetch_etf_list, daily_kline
 
 try:
     import akshare as ak
@@ -55,30 +53,24 @@ def classify_theme(name):
 
 def get_all_etfs():
     if AKSHARE_AVAILABLE:
-        try:
-            df = ak.fund_etf_spot_em()
-            etfs = []
-            for _, row in df.iterrows():
-                etfs.append({
-                    "code": str(row["代码"]),
-                    "name": str(row["名称"]),
-                    "amount": float(row.get("成交额", 0) or 0),
-                })
-            print(f"akshare 获取 {len(etfs)} 只")
-            return etfs
-        except Exception as e:
-            print(f"akshare 失败: {e}")
-    return fetch_etf_list(min_amount=0)
+        df = ak.fund_etf_spot_em()
+        etfs = []
+        for _, row in df.iterrows():
+            etfs.append({
+                "code": str(row["代码"]),
+                "name": str(row["名称"]),
+                "amount": float(row.get("成交额", 0) or 0),
+            })
+        return etfs
+    # fallback 空
+    return []
 
 
-def filter_etfs(min_amount=10_000_000, min_history_days=300, max_etfs=120, verbose=True):
+def filter_etfs(min_amount=5_000_000, max_etfs=150):
     print("获取 ETF 列表...")
     all_etfs = get_all_etfs()
-    print(f"总数: {len(all_etfs)}")
+    print(f"akshare 总数: {len(all_etfs)}")
 
-    # 第一层：名称/代码/成交额过滤
-    # 如果 amount 全为 0（市场关闭），则跳过成交额过滤
-    has_amount = any((e.get("amount") or 0) > 0 for e in all_etfs)
     candidates = []
     for e in all_etfs:
         code = e["code"]
@@ -91,14 +83,14 @@ def filter_etfs(min_amount=10_000_000, min_history_days=300, max_etfs=120, verbo
             continue
         if any(code.startswith(p) for p in EXCLUDE_CODE_PREFIX):
             continue
-        if has_amount and amount < min_amount:
+        if amount < min_amount:
             continue
         e["theme"] = classify_theme(name)
         candidates.append(e)
 
     print(f"名称/成交额过滤后: {len(candidates)}")
 
-    # 同主题保留流动性 top N，避免过度集中
+    # 同主题保留流动性 top
     theme_groups = defaultdict(list)
     for e in candidates:
         theme_groups[e["theme"]].append(e)
@@ -106,71 +98,41 @@ def filter_etfs(min_amount=10_000_000, min_history_days=300, max_etfs=120, verbo
     pre_selected = []
     for theme, items in theme_groups.items():
         items.sort(key=lambda x: x.get("amount", 0), reverse=True)
-        cap = 5 if theme in ["半导体芯片", "医药医疗", "金融科技", "通信AI", "科创板"] else 3
+        cap = 6 if theme in ["半导体芯片", "医药医疗", "金融科技", "通信AI", "科创板", "创业板", "沪深300", "中证500"] else 3
         pre_selected.extend(items[:cap])
 
+    # 按成交额排序，保留 max_etfs
     pre_selected.sort(key=lambda x: x.get("amount", 0), reverse=True)
-    pre_selected = pre_selected[:max_etfs * 2]
-    print(f"预选 {len(pre_selected)} 只，开始检查历史数据...")
-
-    # 第二层：历史数据过滤
-    qualified = []
-    for i, e in enumerate(pre_selected):
-        code = e["code"]
-        try:
-            k = daily_kline(code, limit=min_history_days + 20)
-            if len(k) >= min_history_days:
-                e["history_days"] = len(k)
-                e["avg_amount_20"] = sum(x.get("amount", 0) for x in k[-20:]) / 20
-                qualified.append(e)
-            if verbose and (i+1) % 30 == 0:
-                print(f"  已检查 {i+1}/{len(pre_selected)}, 通过 {len(qualified)}")
-        except Exception as ex:
-            if verbose:
-                print(f"  {code} 失败")
-
-    print(f"历史数据过滤后: {len(qualified)}")
-
-    # 最终排序并限制数量
-    qualified.sort(key=lambda x: x.get("amount", 0), reverse=True)
-    final = qualified[:max_etfs]
+    final = pre_selected[:max_etfs]
     print(f"最终: {len(final)}")
     return final
 
 
-def export_universe(filename="etf_universe.py", min_amount=10_000_000, min_history_days=300, max_etfs=120, log_file="reports/universe_filter.log"):
-    etfs = filter_etfs(min_amount=min_amount, min_history_days=min_history_days, max_etfs=max_etfs, verbose=True)
+def export_universe(filename="etf_universe.py", min_amount=5_000_000, max_etfs=150, log_file="reports/universe_filter.log"):
+    etfs = filter_etfs(min_amount=min_amount, max_etfs=max_etfs)
     codes = [e["code"] for e in etfs]
     with open(filename, "w", encoding="utf-8") as f:
         f.write("# -*- coding: utf-8 -*-\n")
-        f.write(f"# 扩展 ETF 池（按成交额/历史/主题过滤，共 {len(codes)} 只）\n")
+        f.write(f"# 扩展 ETF 池（按成交额/名称/主题过滤，共 {len(codes)} 只）\n")
         f.write("EXPANDED_ETF = [\n")
         for code in codes:
             f.write(f'    "{code}",\n')
         f.write("]\n")
-    
-    # 写日志
+
     import os
     os.makedirs(os.path.dirname(log_file) or ".", exist_ok=True)
     with open(log_file, "w", encoding="utf-8") as f:
         f.write(f"# ETF 筛选日志 {datetime.datetime.now()}\n")
-        f.write(f"min_amount={min_amount}, min_history_days={min_history_days}, max_etfs={max_etfs}\n")
+        f.write(f"min_amount={min_amount}, max_etfs={max_etfs}, akshare_count={len(get_all_etfs())}\n")
         f.write(f"导出数量: {len(codes)}\n\n")
-        f.write("code|name|theme|history_days|amount\n")
-        f.write("---|---|---|---|---\n")
+        f.write("code|name|theme|amount\n")
+        f.write("---|---|---|---\n")
         for e in etfs:
-            f.write(f"{e['code']}|{e['name']}|{e.get('theme','')}|{e.get('history_days',0)}|{e.get('amount',0):.0f}\n")
-    
+            f.write(f"{e['code']}|{e['name']}|{e['theme']}|{e.get('amount',0):.0f}\n")
+
     print(f"已导出 {filename}，共 {len(codes)} 只")
-    print(f"日志已保存 {log_file}")
     return etfs
 
 
 if __name__ == "__main__":
-    etfs = filter_etfs(min_amount=5_000_000, min_history_days=250, max_etfs=150, verbose=True)
-    print("\n前20:")
-    for e in etfs[:20]:
-        print(f"  {e['code']} {e['name']} 主题:{e['theme']} 历史:{e['history_days']}天 成交额:{e.get('amount',0):.0f}")
-    etfs = filter_etfs(min_amount=5_000_000, min_history_days=250, max_etfs=150, verbose=True)
-    print(f"\n最终导出 {len(etfs)} 只\n")
-    export_universe(min_amount=5_000_000, min_history_days=250, max_etfs=150)
+    export_universe()
