@@ -1,0 +1,47 @@
+name: ETF Radar V3 A/B Test
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 7 * * 1-5'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run V3.1
+        run: python3 radar_strategy_v3_1.py
+      - name: Run V3.2
+        run: python3 radar_strategy_v3_2.py
+      - name: Generate dashboards
+        run: |
+          python3 generate_dashboard.py --plan reports/plan_v3_1_$(date +%Y%m%d).json --output pages/index.html
+          python3 generate_dashboard.py --plan reports/plan_v3_2_$(date +%Y%m%d).json --output pages/index_v3_2.html
+      - name: Commit plans
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "ETF Bot"
+          git config user.email "bot@etf-radar.com"
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+          git add reports/ pages/
+          git diff --cached --quiet || git commit -m "A/B: daily plans $(TZ=Asia/Shanghai date +%Y%m%d)"
+          git push || echo "push skipped"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: etf-plan-ab
+          path: reports/plan_v3_*_*.json
