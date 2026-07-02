@@ -2,17 +2,14 @@ name: ETF Radar V3 A/B Test
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '30 7 * * 1-5'
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,9 +20,9 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
       - name: Run V3.1
-        run: python3 radar_strategy_v3_1.py
+        run: python3 radar_strategy_v3_1.py 2>&1 | tee reports/daily_v3_1.log
       - name: Run V3.2
-        run: python3 radar_strategy_v3_2.py
+        run: python3 radar_strategy_v3_2.py 2>&1 | tee reports/daily_v3_2.log
       - name: Generate dashboards
         run: |
           python3 generate_dashboard.py --plan reports/plan_v3_1_$(date +%Y%m%d).json --output pages/index.html
@@ -40,8 +37,9 @@ jobs:
           git add reports/ pages/
           git diff --cached --quiet || git commit -m "A/B: daily plans $(TZ=Asia/Shanghai date +%Y%m%d)"
           git push || echo "push skipped"
-      - name: Upload artifact
+      - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: etf-plan-ab
-          path: reports/plan_v3_*_*.json
+          name: ab-logs
+          path: reports/daily_v3_*.log
