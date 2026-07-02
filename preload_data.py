@@ -4,7 +4,6 @@
 import json
 import os
 from data_source import _batch_from_yahoo, _YAHOO_CACHE
-from etf_universe import CORE_ETF
 
 CORE_ETF = [
     "510300", "510500", "512100", "588000", "510050",
