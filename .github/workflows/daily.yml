@@ -35,8 +35,14 @@ jobs:
         run: python3 radar_strategy_v3_2.py 2>&1
       - name: Generate dashboard
         run: |
-          DATE=$(TZ=Asia/Shanghai date +%Y%m%d)
-          python3 generate_dashboard.py --plan reports/plan_v3_2_${DATE}.json --output pages/index.html 2>&1
+          # 找最新的 plan 文件（避免日期格式不一致问题）
+          LATEST=$(ls -t reports/plan_v3_2_*.json 2>/dev/null | head -1)
+          if [ -z "$LATEST" ]; then
+            echo "No plan file found"
+            exit 1
+          fi
+          echo "Using: $LATEST"
+          python3 generate_dashboard.py --plan "$LATEST" --output pages/index.html 2>&1
       - name: Upload reports
         uses: actions/upload-artifact@v4
         with:
