@@ -426,6 +426,17 @@ def run_backtest(codes=EXPANDED_ETF, top_n=6, fee=0.0005):
         base_equity.append(base_equity[-1] * (1 + r))
     base_total = base_equity[-1] - 1
 
+    # 每日净值曲线（每5日采样一次，避免数据过大）
+    equity_curve = []
+    benchmark_curve = []
+    dates_curve = []
+    for j in range(0, len(equity), 5):
+        if j < len(date_list) - 120:
+            dates_curve.append(date_list[120 + j])
+            equity_curve.append(round(equity[j], 6))
+            if j < len(base_equity):
+                benchmark_curve.append(round(base_equity[j], 6))
+
     return {
         "start_date": date_list[120],
         "end_date": date_list[min_len-1],
@@ -439,6 +450,9 @@ def run_backtest(codes=EXPANDED_ETF, top_n=6, fee=0.0005):
         "final_equity": round(equity[-1], 4),
         "benchmark_300_return": round(base_total * 100, 2),
         "outperform": round((total_ret - base_total) * 100, 2),
+        "equity_curve": equity_curve,
+        "benchmark_curve": benchmark_curve,
+        "dates_curve": dates_curve,
     }
 
 
