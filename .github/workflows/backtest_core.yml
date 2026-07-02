@@ -1,0 +1,35 @@
+name: ETF V3.1 Backtest Core30
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run backtest core 30
+        run: python3 backtest_v3_1.py --top 6 --fee 0.0005
+      - name: Commit result
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "ETF Bot"
+          git config user.email "bot@etf-radar.com"
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+          git add reports/backtest_v3_1_result.json
+          git diff --cached --quiet || git commit -m "backtest: core30 $(date +%Y%m%d)"
+          git push || echo "push skipped"
