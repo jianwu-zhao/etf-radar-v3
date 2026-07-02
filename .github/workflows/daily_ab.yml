@@ -39,15 +39,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -xe
           git config user.name "ETF Bot"
           git config user.email "bot@etf-radar.com"
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
-          git status
           git add reports/ pages/ data_cache/
-          git status --short
           git diff --cached --quiet || git commit -m "A/B: daily plans $(TZ=Asia/Shanghai date +%Y%m%d)"
-          git push
+          git push || echo "push skipped"
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
