@@ -135,4 +135,10 @@ def export_universe(filename="etf_universe.py", min_amount=5_000_000, max_etfs=1
 
 
 if __name__ == "__main__":
-    export_universe()
+    try:
+        export_universe()
+    except Exception as e:
+        import traceback
+        print("ERROR:", e)
+        traceback.print_exc()
+        raise

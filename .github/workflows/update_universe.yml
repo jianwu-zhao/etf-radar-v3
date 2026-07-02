@@ -11,6 +11,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -31,6 +32,12 @@ jobs:
           git config user.name "ETF Bot"
           git config user.email "bot@etf-radar.com"
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
-          git add etf_universe.py reports/universe_filter.log
+          git add etf_universe.py
           git diff --cached --quiet || git commit -m "update: etf universe $(date +%Y%m%d)"
           git push || echo "push skipped"
+      - name: Upload log artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: universe-filter-log
+          path: reports/universe_filter.log
