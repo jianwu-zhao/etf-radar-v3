@@ -42,7 +42,7 @@ def action_class(action):
     return "wait"
 
 
-def generate(data):
+def generate(data, equity_data=None):
     version = data.get("version", "V3.1")
     date = data.get("date", "")
     market = data.get("market_regime", "未知")
@@ -51,6 +51,24 @@ def generate(data):
     total = data.get("etf_total", 0)
     cash = data.get("cash", 0)
     scanned = data.get("all_scanned", 0)
+
+    # 图表数据
+    if equity_data:
+        equity_json = json.dumps({
+            "dates": equity_data.get("dates_curve", []),
+            "equity_curve": equity_data.get("equity_curve", []),
+            "benchmark_curve": equity_data.get("benchmark_curve", []),
+        }, ensure_ascii=False)
+    else:
+        equity_json = '{"dates":[],"equity_curve":[],"benchmark_curve":[]}'
+
+    # 行业轮动数据
+    sec_scores = sector_scores(data.get("positions", []), CORE_SECTOR_MAP)
+    sorted_sec = sorted(sec_scores.items(), key=lambda x: x[1]['score'], reverse=True)
+    sector_json = json.dumps({
+        "labels": [s[0] for s in sorted_sec],
+        "scores": [round(s[1]['score'], 1) for s in sorted_sec],
+    }, ensure_ascii=False)
 
     # 从 positions 提取行业信息
     sec_names = {}
@@ -90,10 +108,6 @@ def generate(data):
         """)
 
     selected_html = "".join(selected_rows) if selected_rows else "<tr><td colspan='15'>暂无入选</td></tr>"
-
-    # 行业轮动
-    sec_scores = sector_scores(data.get("positions", []), CORE_SECTOR_MAP)
-    sec_html = " | ".join([f"<span class=\"badge wait\">{s}:{v['score']:.1f}</span>" for s, v in sorted(sec_scores.items(), key=lambda x: x[1]['score'], reverse=True)])
 
     # 使用指南
     guide = fr"""
@@ -209,6 +223,10 @@ def generate(data):
         .guide-table th {{ background: #0f172a; color: var(--accent); padding: 6px 8px; text-align: left; font-size: 12px; }}
         .guide-table td {{ padding: 6px 8px; border-bottom: 1px solid #334155; text-align: left; color: var(--muted); }}
         .guide-table tr:hover {{ background: #334155; }}
+        .chart-row {{ display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }}
+        .chart-box {{ background: var(--card); border-radius: 10px; padding: 14px; flex: 1; min-width: 300px; }}
+        .chart-box h3 {{ color: var(--accent); font-size: 14px; margin-bottom: 10px; }}
+        .chart-box canvas {{ width: 100% !important; max-height: 280px; }}
         .rules {{ background: var(--card); border-radius: 10px; padding: 14px; margin-top: 20px; font-size: 12px; }}
         .rules h3 {{ margin-bottom: 10px; color: var(--accent); }}
         .rules li {{ margin: 5px 0; color: var(--muted); }}
@@ -218,6 +236,7 @@ def generate(data):
             td.sig, td.plan {{ font-size: 10px; }}
         }}
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -231,6 +250,23 @@ def generate(data):
             <div class="card"><div class="label">ETF 仓位</div><div class="value">{total*100:.1f}%</div></div>
             <div class="card"><div class="label">现金</div><div class="value">{cash*100:.1f}%</div></div>
             <div class="card"><div class="label">入选标的</div><div class="value">{len(positions)}</div></div>
+        </div>
+
+        <div class="chart-row">
+            <div class="chart-box">
+                <h3>📈 策略净值 vs 沪深300</h3>
+                <canvas id="equityChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <h3>📉 最大回撤</h3>
+                <canvas id="drawdownChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-row">
+            <div class="chart-box">
+                <h3>🏭 行业轮动热度</h3>
+                <canvas id="sectorChart"></canvas>
+            </div>
         </div>
 
         <table>
@@ -274,6 +310,120 @@ def generate(data):
             数据源：东方财富 API · 生成时间 {datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")}
         </div>
     </div>
+
+<script>
+const COLORS = {{
+    up: '#ef4444', down: '#22c55e', accent: '#38bdf8', muted: '#94a3b8',
+    card: '#1e293b', bg: '#0f172a',
+}};
+
+// 回测净值数据
+const equityData = {equity_json};
+const dates = equityData.dates || [];
+const strategy = equityData.equity_curve || [];
+const benchmark = equityData.benchmark_curve || [];
+
+// 1. 净值曲线
+if (dates.length > 0 && document.getElementById('equityChart')) {{
+    new Chart(document.getElementById('equityChart'), {{
+        type: 'line',
+        data: {{
+            labels: dates,
+            datasets: [{{
+                label: '策略净值',
+                data: strategy,
+                borderColor: COLORS.accent,
+                backgroundColor: 'rgba(56,189,248,0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 0,
+            }}, {{
+                label: '沪深300',
+                data: benchmark,
+                borderColor: COLORS.muted,
+                backgroundColor: 'rgba(148,163,184,0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 0,
+                borderDash: [5, 5],
+            }}]
+        }},
+        options: {{
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {{ legend: {{ labels: {{ color: COLORS.muted }} }} }},
+            scales: {{
+                x: {{ ticks: {{ color: COLORS.muted, maxTicksLimit: 8 }}, grid: {{ color: 'rgba(148,163,184,0.1)' }} }},
+                y: {{ ticks: {{ color: COLORS.muted }}, grid: {{ color: 'rgba(148,163,184,0.1)' }} }}
+            }}
+        }}
+    }});
+}}
+
+// 2. 回撤图
+if (dates.length > 0 && document.getElementById('drawdownChart')) {{
+    const eq = strategy;
+    let peak = eq[0];
+    const dd = eq.map(v => {{
+        peak = Math.max(peak, v);
+        return peak > 0 ? (v - peak) / peak * 100 : 0;
+    }});
+    new Chart(document.getElementById('drawdownChart'), {{
+        type: 'line',
+        data: {{
+            labels: dates,
+            datasets: [{{
+                label: '回撤 %',
+                data: dd,
+                borderColor: COLORS.up,
+                backgroundColor: 'rgba(239,68,68,0.2)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 0,
+            }}]
+        }},
+        options: {{
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {{ legend: {{ labels: {{ color: COLORS.muted }} }} }},
+            scales: {{
+                x: {{ ticks: {{ color: COLORS.muted, maxTicksLimit: 8 }}, grid: {{ color: 'rgba(148,163,184,0.1)' }} }},
+                y: {{ ticks: {{ color: COLORS.muted, callback: v => v + '%' }}, grid: {{ color: 'rgba(148,163,184,0.1)' }} }}
+            }}
+        }}
+    }});
+}}
+
+// 3. 行业轮动热度
+if (document.getElementById('sectorChart')) {{
+    const sectors = {sector_json};
+    if (sectors.labels && sectors.labels.length > 0) {{
+        new Chart(document.getElementById('sectorChart'), {{
+            type: 'bar',
+            data: {{
+                labels: sectors.labels,
+                datasets: [{{
+                    label: '行业评分',
+                    data: sectors.scores,
+                    backgroundColor: sectors.scores.map(s => s > 50 ? 'rgba(56,189,248,0.7)' : 'rgba(148,163,184,0.5)'),
+                    borderColor: sectors.scores.map(s => s > 50 ? '#38bdf8' : '#94a3b8'),
+                    borderWidth: 1,
+                }}]
+            }},
+            options: {{
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {{ legend: {{ display: false }} }},
+                scales: {{
+                    x: {{ ticks: {{ color: COLORS.muted }}, grid: {{ color: 'rgba(148,163,184,0.1)' }} }},
+                    y: {{ ticks: {{ color: COLORS.muted }}, grid: {{ display: false }} }}
+                }}
+            }}
+        }});
+    }}
+}}
+</script>
 </body>
 </html>
 """
@@ -319,6 +469,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--plan", default=None, help="指定 plan json 文件")
     ap.add_argument("--output", default="pages/index.html", help="输出 html")
+    ap.add_argument("--equity", default=None, help="回测净值数据 json 文件")
     args = ap.parse_args()
 
     if args.plan:
@@ -330,8 +481,27 @@ def main():
         print("未找到 plan json")
         return
 
+    # 加载回测净值数据
+    equity_data = None
+    if args.equity:
+        try:
+            with open(args.equity, "r", encoding="utf-8") as f:
+                equity_data = json.load(f)
+        except:
+            pass
+    else:
+        # 自动找最新的 backtest 结果
+        import glob
+        bt_files = sorted(glob.glob("reports/backtest_v3_2_result.json"), reverse=True)
+        if bt_files:
+            try:
+                with open(bt_files[0], "r", encoding="utf-8") as f:
+                    equity_data = json.load(f)
+            except:
+                pass
+
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
-    html = generate(data)
+    html = generate(data, equity_data)
     with open(args.output, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"已生成 {args.output}")
