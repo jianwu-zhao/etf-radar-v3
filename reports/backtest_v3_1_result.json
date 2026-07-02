@@ -2,13 +2,13 @@
   "start_date": "2024-12-26",
   "end_date": "2026-07-02",
   "trading_days": 363,
-  "total_return": 15.74,
-  "annual_return": 10.68,
+  "total_return": 15.68,
+  "annual_return": 10.64,
   "max_drawdown": 4.21,
   "sharpe": 1.39,
   "volatility": 7.68,
   "trades": 7,
-  "final_equity": 1.1574,
-  "benchmark_300_return": 25.79,
-  "outperform": -10.04
+  "final_equity": 1.1568,
+  "benchmark_300_return": 25.43,
+  "outperform": -9.75
 }
