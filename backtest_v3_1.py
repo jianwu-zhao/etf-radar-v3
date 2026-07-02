@@ -368,8 +368,8 @@ def run_backtest(codes=EXPANDED_ETF, top_n=6, fee=0.0005):
             p = tomorrow_k[code]["close"]
             ind = analyze(history_map[code][:i+2])
             atr = ind.get("atr14") or 0.03
-            stop = max(p * 0.93, p - 2.0 * atr)
-            take = p + 3.0 * atr
+            stop = max(p * 0.93, p - 2.2 * atr)
+            take = p + 4.0 * atr
             positions[code] = {
                 "weight": s["weight"],
                 "entry": p,
