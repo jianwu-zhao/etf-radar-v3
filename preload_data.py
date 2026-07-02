@@ -3,7 +3,7 @@
 """预加载 Yahoo 数据到缓存文件"""
 import json
 import os
-from data_source import _batch_from_yahoo
+from data_source import _batch_from_yahoo, _YAHOO_CACHE
 from etf_universe import CORE_ETF
 
 CORE_ETF = [

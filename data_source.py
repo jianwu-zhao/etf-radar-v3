@@ -206,6 +206,12 @@ def _batch_from_yahoo(codes, limit=500):
     """批量下载 Yahoo 数据"""
     if not YF_AVAILABLE:
         return {}
+    cache = _load_cache()
+    for code in codes:
+        if code in _YAHOO_CACHE:
+            continue
+        if code in cache and cache[code]:
+            _YAHOO_CACHE[code] = cache[code]
     symbols = []
     for code in codes:
         if code in _YAHOO_CACHE:
@@ -265,6 +271,11 @@ def _daily_from_yahoo(code, limit=500):
     """从 Yahoo Finance 获取日K线"""
     if not YF_AVAILABLE:
         return None
+    if code in _YAHOO_CACHE and _YAHOO_CACHE[code]:
+        return _YAHOO_CACHE[code][-limit:]
+    cache = _load_cache()
+    if code in cache and cache[code]:
+        return cache[code][-limit:]
     symbol = _yahoo_symbol(code)
     try:
         ticker = yf.Ticker(symbol)
