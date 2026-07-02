@@ -1,4 +1,4 @@
-name: ETF Radar V3 Daily
+name: ETF Radar V3.2 Daily
 
 on:
   schedule:
@@ -21,57 +21,51 @@ jobs:
   run-strategy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      - name: Install dependencies
+      - name: Install deps
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-
-      - name: Run ETF Radar V3
-        run: python3 radar_strategy_v3_1.py
-
+      - name: Preload data
+        run: python3 preload_data.py 2>&1
+      - name: Run V3.2
+        run: python3 radar_strategy_v3_2.py 2>&1
       - name: Generate dashboard
-        run: python3 generate_dashboard.py
-
+        run: |
+          DATE=$(TZ=Asia/Shanghai date +%Y%m%d)
+          python3 generate_dashboard.py --plan reports/plan_v3_2_${DATE}.json --output pages/index.html 2>&1
       - name: Upload reports
         uses: actions/upload-artifact@v4
         with:
           name: etf-plan-${{ github.run_id }}
-          path: reports/plan_v3_1_*.txt
+          path: reports/plan_v3_2_*.txt
           retention-days: 30
-
-      - name: Commit reports and pages to repo
+      - name: Commit reports and pages
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -xe
           git config user.name "ETF Bot"
           git config user.email "bot@etf-radar.com"
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
-          git add reports/ pages/
-          git status
-          git diff --cached --quiet || (git commit -m "daily: etf plan and dashboard $(TZ=Asia/Shanghai date +%Y%m%d)" && git push)
+          git add reports/ pages/ data_cache/
+          git diff --cached --quiet || (git commit -m "v3.2: daily plan $(TZ=Asia/Shanghai date +%Y%m%d)" && git push --force-with-lease)
           echo "commit done"
-
-      - name: Send Telegram notification
+      - name: Telegram notify
         continue-on-error: true
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         run: |
-          LATEST=$(ls -t reports/plan_v3_1_*.txt | head -1)
+          LATEST=$(ls -t reports/plan_v3_2_*.txt | head -1)
           TEXT=$(cat "$LATEST" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()[:3800]))")
           curl -s -X POST "https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage" \
             -H "Content-Type: application/json" \
             -d "{\"chat_id\":\"$TG_CHAT_ID\",\"text\":$TEXT,\"parse_mode\":\"Markdown\"}" || true
-
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
