@@ -11,6 +11,7 @@ from collections import defaultdict
 
 from data_source import daily_kline
 from etf_universe import EXPANDED_ETF
+from sector_map import CORE_SECTOR_MAP, sector_of
 from tech_indicators import analyze
 
 CORE_ETF = [
@@ -202,7 +203,7 @@ def calc_stop_take(ind):
     return stop, take
 
 
-def select_portfolio(day_idx, history_map, base_k, target_pos, top_n=6):
+def select_portfolio(day_idx, history_map, base_k, target_pos, top_n=6, top_sectors=2):
     regime = detect_regime(base_k, day_idx)
     params = REGIME_PARAMS.get(regime, REGIME_PARAMS["中性"])
 
@@ -237,6 +238,23 @@ def select_portfolio(day_idx, history_map, base_k, target_pos, top_n=6):
             "action": action,
             "relative_strength": rs,
         })
+
+    # 行业轮动：顶级行业加分
+    sector_scores_map = {}
+    sector_items = {}
+    for c in cand:
+        s = sector_of(c["code"], CORE_SECTOR_MAP)
+        sector_items.setdefault(s, []).append(c)
+    for s, items in sector_items.items():
+        avg_score = sum(x["score"] for x in items) / len(items)
+        avg_rs = sum(x["relative_strength"] for x in items) / len(items)
+        sector_scores_map[s] = avg_score + max(0, avg_rs) * 0.5
+    top_sector_names = [s for s, _ in sorted(sector_scores_map.items(), key=lambda x: x[1], reverse=True)[:top_sectors]]
+
+    # 给顶级行业内的 ETF 加分
+    for c in cand:
+        if sector_of(c["code"], CORE_SECTOR_MAP) in top_sector_names:
+            c["score"] += 5
 
     cand.sort(key=lambda x: (x["score"], x["relative_strength"], -(x["rsi"] or 50)), reverse=True)
 
@@ -334,7 +352,7 @@ def run_backtest(codes=EXPANDED_ETF, top_n=6, fee=0.0005):
         equity.append(equity[-1] * (1 + portfolio_ret))
 
         # 调仓：持有仍强的标的，减少换手
-        selected = select_portfolio(i, history_map, base_k, target_pos, top_n)
+        selected = select_portfolio(i, history_map, base_k, target_pos, top_n, top_sectors=2)
 
         # 保留当前仍在前 top_n*1.5 的持仓，降低摩擦
         hold_codes = {x["code"] for x in selected}

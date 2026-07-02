@@ -130,6 +130,34 @@ def daily_kline(code, limit=500):
     return out
 
 
+def intraday_kline(code, period=15, limit=160):
+    """获取 15/60 分钟 K 线（东财）"""
+    secid = _secid(code)
+    klt = "15" if period == 15 else "60"
+    url = (f"https://push2his.eastmoney.com/api/qt/stock/kline/get?secid={secid}"
+           f"&fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13"
+           f"&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61"
+           f"&klt={klt}&fqt=1&end=20500101&lmt={limit}")
+    try:
+        data = _request(url, timeout=20, retries=3)
+        klines = data.get("data", {}).get("klines", [])
+        out = []
+        for k in klines:
+            parts = k.split(",")
+            if len(parts) >= 6:
+                out.append({
+                    "date": parts[0],
+                    "open": round(float(parts[1]), 3),
+                    "close": round(float(parts[2]), 3),
+                    "high": round(float(parts[3]), 3),
+                    "low": round(float(parts[4]), 3),
+                    "volume": int(parts[5]),
+                })
+        return out
+    except:
+        return []
+
+
 def fetch_etf_list(min_amount=10000000):
     """获取 ETF 列表，按成交额过滤"""
     if AKSHARE_AVAILABLE:

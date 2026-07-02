@@ -7,6 +7,7 @@ import os
 import json
 import glob
 import datetime
+from sector_map import CORE_SECTOR_MAP, sector_scores
 
 
 def load_latest_plan():
@@ -75,6 +76,10 @@ def generate(data):
         """)
 
     selected_html = "".join(selected_rows) if selected_rows else "<tr><td colspan='13'>暂无入选</td></tr>"
+
+    # 行业轮动
+    sec_scores = sector_scores(data.get("positions", []), CORE_SECTOR_MAP)
+    sec_html = " | ".join([f"<span class=\"badge wait\">{s}:{v['score']:.1f}</span>" for s, v in sorted(sec_scores.items(), key=lambda x: x[1]['score'], reverse=True)])
 
     html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -151,8 +156,9 @@ def generate(data):
                 <tr>
                     <th>序</th>
                     <th>标的</th>
+                    <th>行业</th>
                     <th>操作建议</th>
-                    <th>拐点信号</th>
+                    <th>15m</th>
                     <th>V4评分</th>
                     <th>MACD柱</th>
                     <th>均值回归</th>

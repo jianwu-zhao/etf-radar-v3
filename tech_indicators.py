@@ -137,6 +137,35 @@ def analyze(klines):
     }
 
 
+def intraday_signal(k15):
+    """15分钟级别择时信号"""
+    if len(k15) < 20:
+        return {"signal": "unknown", "rsi14": None, "macd_hist": 0}
+    closes = [k["close"] for k in k15]
+    from tech_indicators import rsi, macd
+    rsi14 = rsi(closes, 14)
+    macd_vals = macd(closes, 12, 26, 9)
+    recent_low = min(k["low"] for k in k15[-20:])
+    recent_high = max(k["high"] for k in k15[-20:])
+    price = closes[-1]
+    
+    signal = "neutral"
+    if rsi14[-1] < 40 and macd_vals.get("histogram", 0) > -0.01 and price < recent_low * 1.01:
+        signal = "buy_pullback"
+    elif macd_vals.get("histogram", 0) > 0 and rsi14[-1] < 65 and price > recent_high * 0.99:
+        signal = "buy_breakout"
+    elif rsi14[-1] > 75:
+        signal = "overbought"
+    
+    return {
+        "signal": signal,
+        "rsi14": rsi14[-1] if rsi14 else None,
+        "macd_hist": macd_vals.get("histogram", 0),
+        "recent_low": recent_low,
+        "recent_high": recent_high,
+    }
+
+
 if __name__ == "__main__":
     from data_source import daily_kline
     import pprint

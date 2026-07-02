@@ -16,9 +16,10 @@ import argparse
 import datetime
 from typing import List, Dict, Any
 
-from data_source import realtime_quote, daily_kline, fetch_etf_list
+from data_source import realtime_quote, daily_kline, fetch_etf_list, intraday_kline
 from etf_universe import EXPANDED_ETF
-from tech_indicators import analyze
+from sector_map import CORE_SECTOR_MAP, sector_scores, sector_of
+from tech_indicators import analyze, intraday_signal
 from datetime import timezone, timedelta
 
 BEIJING_TZ = timezone(timedelta(hours=8))
@@ -305,6 +306,16 @@ def analyze_one(code: str, regime: str = None, base_k: list = None) -> Dict[str,
         return None
 
 
+def intraday_confirm(code):
+    """15分钟级别确认：返回确认后的动作建议"""
+    try:
+        k15 = intraday_kline(code, period=15, limit=160)
+        sig = intraday_signal(k15)
+        return sig
+    except Exception as e:
+        return {"signal": "unknown", "rsi14": None, "macd_hist": 0}
+
+
 def theme_of(code):
     for t, codes in THEME_MAP.items():
         if code in codes:
@@ -312,12 +323,23 @@ def theme_of(code):
     return "其他"
 
 
-def select_portfolio(analyzed: List[Dict], target_pos: float, top_n=6):
+def select_portfolio(analyzed: List[Dict], target_pos: float, top_n=6, top_sectors=2):
     buy_signals = ["可买", "确认买", "超卖观察"]
     cand = [a for a in analyzed if a["action"] in buy_signals and a["score"] >= 40]
 
+    # 计算行业轮动得分
+    sec_scores = sector_scores(analyzed, CORE_SECTOR_MAP)
+    top_sector_names = [s for s, _ in sorted(sec_scores.items(), key=lambda x: x[1]["score"], reverse=True)[:top_sectors]]
+
+    # 优先从顶级行业中选股
+    sector_cand = [a for a in cand if sector_of(a["code"], CORE_SECTOR_MAP) in top_sector_names]
+    other_cand = [a for a in cand if sector_of(a["code"], CORE_SECTOR_MAP) not in top_sector_names]
+
     # 排序：评分 > 相对强度 > RSI 低
-    cand.sort(key=lambda x: (x["score"], x.get("relative_strength", 0), -(x["rsi14"] or 50)), reverse=True)
+    sector_cand.sort(key=lambda x: (x["score"], x.get("relative_strength", 0), -(x["rsi14"] or 50)), reverse=True)
+    other_cand.sort(key=lambda x: (x["score"], x.get("relative_strength", 0), -(x["rsi14"] or 50)), reverse=True)
+
+    cand = sector_cand + other_cand
 
     theme_count = {}
     deduped = []
@@ -326,6 +348,7 @@ def select_portfolio(analyzed: List[Dict], target_pos: float, top_n=6):
         if theme_count.get(t, 0) >= 2:
             continue
         r["theme"] = t
+        r["sector"] = sector_of(r["code"], CORE_SECTOR_MAP)
         theme_count[t] = theme_count.get(t, 0) + 1
         deduped.append(r)
 
@@ -348,6 +371,22 @@ def select_portfolio(analyzed: List[Dict], target_pos: float, top_n=6):
             for m in members:
                 m["weight"] = round(m["weight"] * scale, 4)
 
+    # 15分钟级别确认：只给买入信号的 ETF 做
+    for x in selected:
+        if x["action"] in ["可买", "确认买"]:
+            sig = intraday_confirm(x["code"])
+            x["intra_signal"] = sig["signal"]
+            x["intra_rsi14"] = sig["rsi14"]
+            x["intra_macd_hist"] = sig["macd_hist"]
+            if sig["signal"] == "overbought":
+                x["action"] = "观察"  # 15分钟超买，降级
+            elif sig["signal"] in ["buy_pullback", "buy_breakout"]:
+                x["action"] = "确认买"  # 15分钟确认
+        else:
+            x["intra_signal"] = "-"
+            x["intra_rsi14"] = None
+            x["intra_macd_hist"] = 0
+
     selected = [x for x in selected if x["weight"] >= SINGLE_MIN]
     return selected
 
@@ -366,13 +405,20 @@ def build_report(market_regime, target_pos, selected, analyzed_count):
     lines.append(f"目标仓位   : {target_pos:.0%}")
     lines.append(f"扫描 ETF   : {analyzed_count} 只")
     lines.append("")
-    lines.append(f"{'ETF':<12}{'代码':<8}{'动作':<8}{'评分':>6}{'RSI':>6}{'RS':>7}{'仓':>6}{'现价':>8}{'止损':>8}{'止盈':>8}")
-    lines.append("-" * 86)
+    # 行业轮动信息
+    sec_scores = sector_scores(selected, CORE_SECTOR_MAP)
+    sec_line = " | ".join([f"{s}:{v['score']:.1f}" for s, v in sorted(sec_scores.items(), key=lambda x: x[1]['score'], reverse=True)])
+    lines.append(f"行业轮动   : {sec_line}")
+    lines.append("")
+    lines.append(f"{'ETF':<10}{'代码':<8}{'动作':<8}{'评分':>6}{'RSI':>6}{'RS':>7}{'15m':>6}{'仓':>6}{'现价':>8}{'止损':>8}{'止盈':>8}")
+    lines.append("-" * 96)
     for x in selected:
+        intra = x.get('intra_signal','-')
         lines.append(
-            f"{x['name']:<12}{x['code']:<8}{x['action']:<8}"
+            f"{x['name']:<10}{x['code']:<8}{x['action']:<8}"
             f"{x['score']:>6.1f}{(x['rsi14'] or 0):>6.1f}"
             f"{x.get('relative_strength',0):>+6.1f}"
+            f"{intra:>6}"
             f"{x['weight']*100:>5.1f}%"
             f"{x['price']:>8.3f}{x['stop']:>8.3f}{x['take_profit']:>8.3f}"
         )
