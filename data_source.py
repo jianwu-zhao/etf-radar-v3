@@ -60,34 +60,76 @@ def realtime_quote(code):
     """实时行情"""
     if AKSHARE_AVAILABLE:
         try:
-            df = ak.fund_etf_hist_em(symbol=code, period="daily", start_date="20990101", end_date="20990101", adjust="qfq")
-            return None  # 历史接口不适合实时
-        except:
+            df = ak.fund_etf_spot_em()
+            row = df[df["代码"] == code]
+            if not row.empty:
+                r = row.iloc[0]
+                return {
+                    "code": code,
+                    "name": str(r.get("名称", "")).replace("ETF", ""),
+                    "price": float(r.get("最新价", 0) or 0),
+                    "open": float(r.get("今开", 0) or 0),
+                    "high": float(r.get("最高价", 0) or 0),
+                    "low": float(r.get("最低价", 0) or 0),
+                    "pre_close": float(r.get("昨收", 0) or 0),
+                    "volume": int(r.get("成交量", 0) or 0),
+                    "amount": float(r.get("成交额", 0) or 0),
+                    "change_pct": float(r.get("涨跌幅", 0) or 0),
+                    "update_time": datetime.now().strftime("%H:%M:%S"),
+                }
+        except Exception as e:
             pass
+
+    # fallback: yfinance
+    yd = _daily_from_yahoo(code, limit=2)
+    if yd and len(yd) >= 1:
+        latest = yd[-1]
+        prev = yd[-2] if len(yd) >= 2 else latest
+        return {
+            "code": code,
+            "name": code,
+            "price": latest["close"],
+            "open": latest["open"],
+            "high": latest["high"],
+            "low": latest["low"],
+            "pre_close": prev["close"],
+            "volume": latest["volume"],
+            "amount": 0,
+            "change_pct": round((latest["close"]-prev["close"])/prev["close"]*100, 2),
+            "update_time": datetime.now().strftime("%H:%M:%S"),
+        }
 
     secid = _secid(code)
     url = f"https://push2.eastmoney.com/api/qt/stock/get?secid={secid}&fields=f43,f44,f45,f46,f47,f48,f57,f58,f60,f169,f170,f171"
-    data = _request(url)
-    d = data.get("data", {})
-    if not d:
-        return None
-    return {
-        "code": code,
-        "name": d.get("f58", "").replace("ETF", ""),
-        "price": _price(d.get("f43")),
-        "open": _price(d.get("f46")),
-        "high": _price(d.get("f44")),
-        "low": _price(d.get("f45")),
-        "pre_close": _price(d.get("f60")),
-        "volume": d.get("f47", 0),
-        "amount": d.get("f48", 0),
-        "change_pct": _pct(d.get("f170")),
-        "update_time": datetime.now().strftime("%H:%M:%S"),
-    }
+    try:
+        data = _request(url)
+        d = data.get("data", {})
+        if d:
+            return {
+                "code": code,
+                "name": d.get("f58", "").replace("ETF", ""),
+                "price": _price(d.get("f43")),
+                "open": _price(d.get("f46")),
+                "high": _price(d.get("f44")),
+                "low": _price(d.get("f45")),
+                "pre_close": _price(d.get("f60")),
+                "volume": d.get("f47", 0),
+                "amount": d.get("f48", 0),
+                "change_pct": _pct(d.get("f170")),
+                "update_time": datetime.now().strftime("%H:%M:%S"),
+            }
+    except:
+        pass
+    return None
 
 
 def daily_kline(code, limit=500):
     """日K线"""
+    # 优先 Yahoo Finance（GitHub Actions 可用）
+    yd = _daily_from_yahoo(code, limit)
+    if yd:
+        return yd
+
     if AKSHARE_AVAILABLE:
         try:
             end = datetime.now().strftime("%Y%m%d")
@@ -110,12 +152,6 @@ def daily_kline(code, limit=500):
                 return out[-limit:]
         except Exception as e:
             pass
-
-    # 兜底：Yahoo Finance
-    yahoo_data = _daily_from_yahoo(code, limit)
-    if yahoo_data:
-        print(f"  {code} 使用 Yahoo Finance 数据")
-        return yahoo_data
 
     secid = _secid(code)
     url = (f"https://push2his.eastmoney.com/api/qt/stock/kline/get?secid={secid}"

@@ -17,24 +17,23 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Test akshare
+      - name: Test akshare spot
         run: |
           python3 -c "import akshare; print('akshare version:', akshare.__version__)" 2>&1 | tee reports/test_akshare.log
           python3 -c "
           import akshare as ak
-          df = ak.fund_etf_hist_em(symbol='518880', period='daily', start_date='20250101', end_date='20260701', adjust='qfq')
-          print('rows:', len(df))
-          print(df.head(1))
-          print(df.tail(1))
+          df = ak.fund_etf_spot_em()
+          print('spot rows:', len(df))
+          print(df[df['代码']=='518880'])
           " 2>&1 | tee -a reports/test_akshare.log
       - name: Test data_source
         run: |
           python3 -c "
           from data_source import daily_kline, realtime_quote
-          print('realtime:', realtime_quote('518880'))
           k = daily_kline('518880', limit=5)
           print('kline rows:', len(k))
           print(k[0])
+          print('realtime:', realtime_quote('518880'))
           " 2>&1 | tee reports/test_data.log
       - name: Upload logs
         if: always()
