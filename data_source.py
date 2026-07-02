@@ -8,6 +8,12 @@ import math
 import urllib.request
 from datetime import datetime
 
+try:
+    import yfinance as yf
+    YF_AVAILABLE = True
+except ImportError:
+    YF_AVAILABLE = False
+
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 
 AKSHARE_AVAILABLE = False
@@ -105,6 +111,12 @@ def daily_kline(code, limit=500):
         except Exception as e:
             pass
 
+    # 兜底：Yahoo Finance
+    yahoo_data = _daily_from_yahoo(code, limit)
+    if yahoo_data:
+        print(f"  {code} 使用 Yahoo Finance 数据")
+        return yahoo_data
+
     secid = _secid(code)
     url = (f"https://push2his.eastmoney.com/api/qt/stock/kline/get?secid={secid}"
            f"&fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13"
@@ -128,6 +140,41 @@ def daily_kline(code, limit=500):
                 "change_pct": float(parts[8]) if len(parts) > 8 else 0,
             })
     return out
+
+
+def _yahoo_symbol(code):
+    """A股 ETF 转 Yahoo 代码"""
+    if code.startswith(("51", "58", "56", "50", "52")):
+        return f"{code}.SS"
+    return f"{code}.SZ"
+
+
+def _daily_from_yahoo(code, limit=500):
+    """从 Yahoo Finance 获取日K线"""
+    if not YF_AVAILABLE:
+        return None
+    symbol = _yahoo_symbol(code)
+    try:
+        ticker = yf.Ticker(symbol)
+        df = ticker.history(period="2y")
+        if df is None or len(df) == 0:
+            return None
+        df = df.reset_index()
+        out = []
+        for _, row in df.iterrows():
+            out.append({
+                "date": row["Date"].strftime("%Y-%m-%d"),
+                "open": round(float(row["Open"]), 3),
+                "close": round(float(row["Close"]), 3),
+                "high": round(float(row["High"]), 3),
+                "low": round(float(row["Low"]), 3),
+                "volume": int(row["Volume"]),
+                "amount": 0,
+            })
+        return out[-limit:]
+    except Exception as e:
+        print(f"Yahoo fallback error: {e}")
+        return None
 
 
 def intraday_kline(code, period=15, limit=160):
