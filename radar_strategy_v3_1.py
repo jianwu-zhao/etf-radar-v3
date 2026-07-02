@@ -217,6 +217,11 @@ def signal_action(ind: Dict, score: float, regime: str) -> str:
     if params["momentum"] == "strong":
         if score >= 60 and rsi < params["rsi_max"] and price > ma20:
             return "可买"
+        # 强者恒强：高动量 + 高相对强度 + MACD红柱
+        rs = ind.get("relative_strength") or 0
+        mom20 = ind.get("momentum_20") or 0
+        if mom20 > 15 and rs > 20 and rsi < 80 and price > ma20 and macd_h > 0:
+            return "可买"
         if score >= 55 and price > ma5 and macd_h > 0:
             return "确认买"
     else:
@@ -407,7 +412,7 @@ def main():
     ap.add_argument("--no-save", action="store_true")
     args = ap.parse_args()
 
-    codes = args.codes.split(",") if args.codes else EXPANDED_ETF
+    codes = args.codes.split(",") if args.codes else CORE_ETF
 
     log("开始获取大盘状态...")
     market_regime, auto_pos = detect_market_regime()

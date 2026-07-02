@@ -173,6 +173,10 @@ def signal_action(ind, score, regime):
     if params["momentum"] == "strong":
         if score >= 60 and rsi < params["rsi_max"] and price > ma20:
             return "可买"
+        rs = ind.get("relative_strength") or 0
+        mom20 = ind.get("momentum_20") or 0
+        if mom20 > 15 and rs > 20 and rsi < 80 and price > ma20 and macd_h > 0:
+            return "可买"
         if score >= 55 and price > ma5 and macd_h > 0:
             return "确认买"
     else:
@@ -277,9 +281,11 @@ def run_backtest(codes=EXPANDED_ETF, top_n=6, fee=0.0005):
     for code in codes:
         try:
             k = daily_kline(code, limit=500)
-            if len(k) >= 120:
+            if len(k) >= 300:
                 history_map[code] = k
                 min_len = min(min_len, len(k))
+            else:
+                print(f"  {code} 历史数据不足: {len(k)} 天，跳过")
         except Exception as e:
             print(f"  {code} 加载失败: {e}")
     print(f"加载完成: {len(history_map)} 只, 最短 {min_len} 天, 耗时 {time.time()-t0:.1f}s")
