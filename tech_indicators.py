@@ -120,6 +120,11 @@ def analyze(klines):
     momentum_20 = (closes[-1] - closes[-21]) / closes[-21] * 100 if len(closes) >= 21 else None
     momentum_60 = (closes[-1] - closes[-61]) / closes[-61] * 100 if len(closes) >= 61 else None
     
+    # 新指标：R²动量质量、MA Energy、乖离率回归
+    mq_score, mq_r2, mq_ann = momentum_quality(closes, 25)
+    me_total, me_detail = ma_energy(closes, [10, 20, 60])
+    bias_score, bias_r2, bias_slope = bias_regression_slope(closes, 60, 54)
+    
     return {
         "price": closes[-1],
         "ma5": round(ma5, 3),
@@ -134,7 +139,117 @@ def analyze(klines):
         "momentum_20": round(momentum_20, 2) if momentum_20 else None,
         "momentum_60": round(momentum_60, 2) if momentum_60 else None,
         "volatility_20": round(sum(abs(x) for x in daily_ret[-20:]) / 20, 2) if len(daily_ret) >= 20 else None,
+        "momentum_quality_score": mq_score,
+        "momentum_quality_r2": mq_r2,
+        "momentum_quality_ann": mq_ann,
+        "ma_energy_total": round(me_total, 2),
+        "ma_energy_detail": me_detail,
+        "bias_regression_score": bias_score,
+        "bias_regression_r2": bias_r2,
+        "bias_regression_slope": bias_slope,
     }
+
+
+
+def momentum_quality(closes, window=25):
+    """
+    动量质量评分 = 年化收益率 × R²
+    使用加权线性回归计算动量斜率，R² 衡量趋势稳定性
+    返回 (score, r_squared, annualized_return)
+    """
+    if len(closes) < window:
+        return 0, 0, 0
+    y = closes[-window:]
+    import math
+    n = len(y)
+    x = list(range(n))
+    # log 价格
+    log_y = [math.log(v) for v in y]
+    # 权重：近期更高
+    weights = [1 + (i / (n - 1)) for i in range(n)]  # 1→2 线性递增
+    # 加权线性回归
+    sum_w = sum(weights)
+    sum_wx = sum(w * xi for w, xi in zip(weights, x))
+    sum_wy = sum(w * yi for w, yi in zip(weights, log_y))
+    sum_wxy = sum(w * xi * yi for w, xi, yi in zip(weights, x, log_y))
+    sum_wx2 = sum(w * xi * xi for w, xi in zip(weights, x))
+    denom = sum_w * sum_wx2 - sum_wx * sum_wx
+    if denom == 0:
+        return 0, 0, 0
+    slope = (sum_w * sum_wxy - sum_wx * sum_wy) / denom
+    intercept = (sum_wy - slope * sum_wx) / sum_w
+    # 年化收益率
+    annualized = math.exp(slope * 250) - 1
+    # R² 计算
+    y_mean = sum(log_y) / n
+    ss_tot = sum((yi - y_mean) ** 2 for yi in log_y)
+    ss_res = sum((log_y[i] - (slope * x[i] + intercept)) ** 2 for i in range(n))
+    r2 = 1 - (ss_res / ss_tot) if ss_tot > 0 else 0
+    score = annualized * max(0, r2)
+    return round(score, 6), round(r2, 4), round(annualized, 6)
+
+
+def ma_energy(closes, windows=[10, 20, 60]):
+    """
+    多周期 MA Energy 指标
+    计算多个周期均线偏离度的加权平均
+    返回综合能量值 (正=多头, 负=空头)
+    """
+    if len(closes) < max(windows):
+        return 0, {}
+    results = {}
+    total_energy = 0
+    weights = {10: 0.5, 20: 0.3, 60: 0.2}  # 短周期权重高
+    for w in windows:
+        from tech_indicators import sma
+        mas = sma(closes, w)
+        if mas:
+            ma = mas[-1]
+            energy = (closes[-1] - ma) / ma * 100  # 百分比形式
+            results[f"energy_{w}"] = round(energy, 2)
+            total_energy += energy * weights.get(w, 1/len(windows))
+    results["ma_energy"] = round(total_energy, 2)
+    return total_energy, results
+
+
+def bias_regression_slope(closes, price_ma_window=60, reg_window=54):
+    """
+    乖离率回归斜率动量
+    先计算乖离率序列 (price - MA60) / MA60 * 100
+    再对乖离率序列做线性回归，斜率 × R² 作为动量
+    """
+    if len(closes) < price_ma_window + reg_window:
+        return 0, 0, 0
+    from tech_indicators import sma
+    mas = sma(closes, price_ma_window)
+    if not mas or len(mas) < reg_window:
+        return 0, 0, 0
+    # 乖离率序列
+    biases = []
+    for i in range(reg_window):
+        price = closes[-(price_ma_window + reg_window) + i]
+        ma = mas[-(reg_window) + i]
+        bias = (price - ma) / ma * 100
+        biases.append(bias)
+    # 线性回归
+    n = len(biases)
+    x = list(range(n))
+    sum_x = sum(x)
+    sum_y = sum(biases)
+    sum_xy = sum(xi * yi for xi, yi in zip(x, biases))
+    sum_x2 = sum(xi * xi for xi in x)
+    denom = n * sum_x2 - sum_x * sum_x
+    if denom == 0:
+        return 0, 0, 0
+    slope = (n * sum_xy - sum_x * sum_y) / denom
+    intercept = (sum_y - slope * sum_x) / n
+    y_pred = [slope * xi + intercept for xi in x]
+    y_mean = sum(biases) / n
+    ss_tot = sum((y - y_mean) ** 2 for y in biases)
+    ss_res = sum((biases[i] - y_pred[i]) ** 2 for i in range(n))
+    r2 = 1 - (ss_res / ss_tot) if ss_tot > 0 else 0
+    score = slope * max(0, r2)
+    return round(score, 6), round(r2, 4), round(slope, 6)
 
 
 def intraday_signal(k15):
