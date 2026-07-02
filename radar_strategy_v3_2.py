@@ -498,11 +498,11 @@ def main():
     if not args.no_save:
         os.makedirs(REPORT_DIR, exist_ok=True)
         day = data["date"]
-        with open(os.path.join(REPORT_DIR, f"plan_v3_1_{day}.txt"), "w", encoding="utf-8") as f:
+        with open(os.path.join(REPORT_DIR, f"plan_v3_2_{day}.txt"), "w", encoding="utf-8") as f:
             f.write(report)
-        with open(os.path.join(REPORT_DIR, f"plan_v3_1_{day}.json"), "w", encoding="utf-8") as f:
+        with open(os.path.join(REPORT_DIR, f"plan_v3_2_{day}.json"), "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
-        log(f"已保存: reports/plan_v3_1_{day}.txt/.json")
+        log(f"已保存: reports/plan_v3_2_{day}.txt/.json")
 
 
 if __name__ == "__main__":
