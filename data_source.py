@@ -123,8 +123,21 @@ def realtime_quote(code):
     return None
 
 
+def _load_cache():
+    try:
+        with open("data_cache/yahoo_cache.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        return {}
+
+
 def daily_kline(code, limit=500):
     """日K线"""
+    # 优先读取缓存
+    cache = _load_cache()
+    if code in cache and cache[code]:
+        return cache[code][-limit:]
+
     # 优先 Yahoo Finance（GitHub Actions 可用）
     yd = _daily_from_yahoo(code, limit)
     if yd:
