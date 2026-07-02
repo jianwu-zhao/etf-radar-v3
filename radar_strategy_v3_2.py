@@ -53,16 +53,15 @@ THEME_CAP = {k: 0.20 for k in THEME_MAP}
 THEME_CAP.update({"宽基": 0.30, "黄金": 0.15, "有色商品": 0.20})
 
 SINGLE_MAX = 0.20
-SINGLE_MIN = 0.03   # 降低最小仓位，允许更多 ETF 分散入选
+SINGLE_MIN = 0.05
 
 # 市场状态自适应参数
 REGIME_PARAMS = {
-    # 进攻版：牛市中更激进，争取跑赢沪深300
-    "强多": {"target": 1.00, "rsi_max": 75, "score_thr": 35, "momentum": "strong"},
-    "偏多": {"target": 0.95, "rsi_max": 65, "score_thr": 40, "momentum": "balanced"},
-    "中性": {"target": 0.70, "rsi_max": 55, "score_thr": 45, "momentum": "balanced"},
-    "偏空": {"target": 0.40, "rsi_max": 45, "score_thr": 50, "momentum": "reversal"},
-    "强空": {"target": 0.15, "rsi_max": 40, "score_thr": 55, "momentum": "reversal"},
+    "强多": {"target": 0.95, "rsi_max": 70, "score_thr": 45, "momentum": "strong"},
+    "偏多": {"target": 0.85, "rsi_max": 60, "score_thr": 45, "momentum": "balanced"},
+    "中性": {"target": 0.50, "rsi_max": 50, "score_thr": 50, "momentum": "balanced"},
+    "偏空": {"target": 0.35, "rsi_max": 45, "score_thr": 55, "momentum": "reversal"},
+    "强空": {"target": 0.10, "rsi_max": 40, "score_thr": 60, "momentum": "reversal"},
 }
 
 
@@ -241,24 +240,12 @@ def signal_action(ind: Dict, score: float, regime: str) -> str:
     return "等待"
 
 
-def calc_stop_take(ind: Dict, regime=None) -> (float, float):
+def calc_stop_take(ind: Dict) -> (float, float):
     atr = ind.get("atr14") or 0.03
     price = ind["price"]
-    
-    # 进攻版：根据市场状态调整止盈止损
-    if regime == "强多":
-        stop_mult, take_mult = 2.5, 5.0   # 牛市拿更久
-    elif regime == "偏多":
-        stop_mult, take_mult = 2.2, 4.0
-    elif regime == "中性":
-        stop_mult, take_mult = 2.0, 3.5
-    elif regime in ("偏空", "强空"):
-        stop_mult, take_mult = 1.8, 3.0   # 弱势紧止损
-    else:
-        stop_mult, take_mult = 2.0, 3.5
-    
-    stop = round(max(price * (1 - 0.07 - 0.01 * stop_mult), price - stop_mult * atr), 3)
-    take = round(price + take_mult * atr, 3)
+    # 趋势强时用更宽的止损
+    stop = round(max(price * 0.93, price - 2.0 * atr), 3)
+    take = round(price + 3.0 * atr, 3)
     return stop, take
 
 
@@ -287,7 +274,7 @@ def analyze_one(code: str, regime: str = None, base_k: list = None) -> Dict[str,
         score = factor_score(ind, rt, regime) + vol_score
         score = min(100, score)
         action = signal_action(ind, score, regime)
-        stop, take = calc_stop_take(ind, regime=regime)
+        stop, take = calc_stop_take(ind)
         rs = relative_strength(code, klines, base_k)
 
         return {
@@ -336,7 +323,7 @@ def theme_of(code):
     return "其他"
 
 
-def select_portfolio(analyzed: List[Dict], target_pos: float, top_n=10, top_sectors=3):
+def select_portfolio(analyzed: List[Dict], target_pos: float, top_n=6, top_sectors=2):
     buy_signals = ["可买", "确认买", "超卖观察"]
     cand = [a for a in analyzed if a["action"] in buy_signals and a["score"] >= 40]
 
@@ -406,7 +393,8 @@ def select_portfolio(analyzed: List[Dict], target_pos: float, top_n=10, top_sect
 
 def build_report(market_regime, target_pos, selected, analyzed_count, data_date=None):
     if data_date:
-        today = data_date
+        # 数据源日期格式可能是 YYYY-MM-DD，统一成 YYYYMMDD
+        today = data_date.replace("-", "")
     else:
         today = datetime.datetime.now(BEIJING_TZ).strftime("%Y%m%d")
     etf_sum = round(sum(x["weight"] for x in selected), 4)
@@ -468,7 +456,7 @@ def build_report(market_regime, target_pos, selected, analyzed_count, data_date=
 def main():
     ap = argparse.ArgumentParser(description="ETF 波段雷达 V3.2")
     ap.add_argument("--codes", help="指定 ETF 代码，逗号分隔")
-    ap.add_argument("--top", type=int, default=10)
+    ap.add_argument("--top", type=int, default=6)
     ap.add_argument("--position", type=float, default=None)
     ap.add_argument("--all", action="store_true", help="使用扩展 ETF 池（100+只）")
     ap.add_argument("--notify", action="store_true")
@@ -503,11 +491,6 @@ def main():
     data_date = None
     if base_k and len(base_k) > 0:
         data_date = base_k[-1].get("date", "")
-    if not data_date and analyzed:
-        # 从第一个分析的ETF获取日期
-        k = daily_kline(analyzed[0]["code"], limit=1)
-        if k:
-            data_date = k[-1].get("date", "")
 
     selected = select_portfolio(analyzed, target_pos, top_n=args.top)
     report, data = build_report(market_regime, target_pos, selected, len(analyzed), data_date=data_date)
