@@ -9,7 +9,7 @@ import math
 import argparse
 from collections import defaultdict
 
-from data_source import daily_kline, _batch_from_yahoo
+from data_source import daily_kline
 from etf_universe import EXPANDED_ETF, EXPANDED_ETF_TOP50
 from sector_map import CORE_SECTOR_MAP, sector_of
 from tech_indicators import analyze
@@ -79,16 +79,10 @@ def detect_regime(base_k, day_idx):
 
 
 def factor_score(ind, regime):
-    """增强版评分：R²动量质量 + MA Energy + 乖离率回归"""
     params = REGIME_PARAMS.get(regime, REGIME_PARAMS["中性"])
     momentum_mode = params["momentum"]
     score = 0
 
-    mq_r2 = ind.get("momentum_quality_r2", 0) or 0
-    me_total = ind.get("ma_energy_total", 0) or 0
-    bias_score = ind.get("bias_regression_score", 0) or 0
-
-    # 1. 趋势因子
     if ind["ma5"] > ind["ma10"] > ind["ma20"] > ind["ma60"]:
         score += 25
     elif ind["ma5"] > ind["ma20"] > ind["ma60"]:
@@ -98,59 +92,37 @@ def factor_score(ind, regime):
     elif ind["price"] > ind["ma60"]:
         score += 5
 
-    # MA Energy 增强
-    if me_total > 5:
-        score += 8
-    elif me_total > 2:
-        score += 4
-    elif me_total < -5:
-        score -= 6
-    elif me_total < -2:
-        score -= 3
-
-    # 2. 动量因子（R² 质量过滤）
     mom20 = ind.get("momentum_20") or 0
     mom60 = ind.get("momentum_60") or 0
-    base_mom = 0
     if momentum_mode == "strong":
         if mom20 > 15:
-            base_mom = 20
+            score += 20
         elif mom20 > 8:
-            base_mom = 15
+            score += 15
         elif mom20 > 0:
-            base_mom = 8
+            score += 8
         elif mom20 > -5:
-            base_mom = 3
+            score += 3
     elif momentum_mode == "reversal":
         if -15 < mom20 < -5:
-            base_mom = 15
+            score += 15
         elif mom20 < -15:
-            base_mom = 10
+            score += 10
         elif 0 < mom20 < 10:
-            base_mom = 8
+            score += 8
     else:
         if 3 < mom20 < 15:
-            base_mom = 18
+            score += 18
         elif 0 < mom20 < 20:
-            base_mom = 12
+            score += 12
         elif -10 < mom20 < 0:
-            base_mom = 6
+            score += 6
 
-    if mq_r2 >= 0.7:
-        score += int(base_mom * 1.0)
-    elif mq_r2 >= 0.5:
-        score += int(base_mom * 0.8)
-    elif mq_r2 >= 0.3:
-        score += int(base_mom * 0.5)
-    else:
-        score += int(base_mom * 0.25)
-
-    if mom60 > 10 and mq_r2 >= 0.5:
+    if mom60 > 10:
         score += 5
-    elif mom60 > 0 and mq_r2 >= 0.3:
+    elif mom60 > 0:
         score += 2
 
-    # 3. 反转因子
     rsi = ind.get("rsi14") or 50
     if rsi < 30:
         score += 15
@@ -162,7 +134,6 @@ def factor_score(ind, regime):
     if momentum_mode == "strong" and 55 < rsi < params["rsi_max"]:
         score += 8
 
-    # 4. 结构因子
     bb = ind.get("bollinger", {})
     pb = bb.get("percent_b", 50)
     if pb < 20:
@@ -172,36 +143,24 @@ def factor_score(ind, regime):
     elif pb > 80:
         score -= 10
 
-    # 5. MACD
     macd = ind.get("macd", {})
     if macd.get("histogram", 0) > 0 and macd.get("macd", 0) > macd.get("signal", 0):
         score += 10
     elif macd.get("histogram", 0) > 0:
         score += 6
 
-    # 6. 均值回归
     ma60_dist = (ind["price"] / ind["ma60"] - 1) * 100 if ind["ma60"] else 0
     if ma60_dist < -10:
         score += 10
     elif ma60_dist < -5:
         score += 5
 
-    # 7. 成交量
+    # 成交量
     vol_ratio = ind.get("volume_ratio", 1)
     if vol_ratio > 1.5:
         score += 10
     elif vol_ratio > 1.2:
         score += 5
-
-    # 8. 乖离率回归
-    if bias_score > 0.5:
-        score += 10
-    elif bias_score > 0.1:
-        score += 6
-    elif bias_score < -0.5:
-        score -= 8
-    elif bias_score < -0.1:
-        score -= 3
 
     return max(0, min(100, score))
 
@@ -239,29 +198,10 @@ def signal_action(ind, score, regime):
 def calc_stop_take(ind):
     atr = ind.get("atr14") or 0.03
     price = ind["price"]
-    mq_r2 = ind.get("momentum_quality_r2", 0) or 0
-    me_total = ind.get("ma_energy_total", 0) or 0
-    bias_score = ind.get("bias_regression_score", 0) or 0
-
-    if mq_r2 >= 0.7:
-        stop_mult, take_mult = 2.4, 4.5
-    elif mq_r2 >= 0.5:
-        stop_mult, take_mult = 2.2, 4.0
-    elif mq_r2 >= 0.3:
-        stop_mult, take_mult = 2.0, 3.5
-    else:
-        stop_mult, take_mult = 1.8, 3.0
-
-    if me_total > 8:
-        take_mult += 1.0
-    elif me_total > 3:
-        take_mult += 0.5
-
-    if bias_score > 0.3:
-        take_mult += 0.5
-
-    stop = round(max(price * (1 - 0.06 - 0.01 * stop_mult), price - stop_mult * atr), 3)
-    take = round(price + take_mult * atr, 3)
+    stop = round(max(price * 0.93, price - 2.0 * atr), 3)
+    take = round(price + 3.0 * atr), 3
+    if isinstance(take, tuple):
+        take = take[0]
     return stop, take
 
 
@@ -359,11 +299,6 @@ def select_portfolio(day_idx, history_map, base_k, target_pos, top_n=6, top_sect
 def run_backtest(codes=EXPANDED_ETF, top_n=6, fee=0.0005):
     import time
     print("加载历史数据...")
-    try:
-        _batch_from_yahoo(codes, limit=500)
-        print("Yahoo 批量预加载完成")
-    except Exception as e:
-        print("Yahoo 批量预加载失败:", e)
     t0 = time.time()
     history_map = {}
     base_k = daily_kline("510300", limit=500)
