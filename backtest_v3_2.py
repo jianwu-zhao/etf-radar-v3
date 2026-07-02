@@ -38,14 +38,14 @@ THEME_MAP = {
 THEME_CAP = defaultdict(lambda: 0.20)
 THEME_CAP.update({"宽基": 0.30, "黄金": 0.15, "有色商品": 0.20})
 SINGLE_MAX = 0.20
-SINGLE_MIN = 0.05
+SINGLE_MIN = 0.03
 
 REGIME_PARAMS = {
-    "强多": {"target": 0.95, "rsi_max": 70, "score_thr": 45, "momentum": "strong", "stop_mul": 2.2, "take_mul": 4.0},
-    "偏多": {"target": 0.85, "rsi_max": 60, "score_thr": 45, "momentum": "balanced", "stop_mul": 2.2, "take_mul": 4.0},
-    "中性": {"target": 0.50, "rsi_max": 50, "score_thr": 50, "momentum": "balanced", "stop_mul": 2.2, "take_mul": 4.0},
-    "偏空": {"target": 0.35, "rsi_max": 45, "score_thr": 55, "momentum": "reversal", "stop_mul": 2.2, "take_mul": 4.0},
-    "强空": {"target": 0.10, "rsi_max": 40, "score_thr": 60, "momentum": "reversal", "stop_mul": 2.2, "take_mul": 4.0},
+    "强多": {"target": 1.00, "rsi_max": 75, "score_thr": 35, "momentum": "strong", "stop_mul": 2.5, "take_mul": 5.0},
+    "偏多": {"target": 0.95, "rsi_max": 65, "score_thr": 40, "momentum": "balanced", "stop_mul": 2.2, "take_mul": 4.0},
+    "中性": {"target": 0.70, "rsi_max": 55, "score_thr": 45, "momentum": "balanced", "stop_mul": 2.0, "take_mul": 3.5},
+    "偏空": {"target": 0.40, "rsi_max": 45, "score_thr": 50, "momentum": "reversal", "stop_mul": 1.8, "take_mul": 3.0},
+    "强空": {"target": 0.15, "rsi_max": 40, "score_thr": 55, "momentum": "reversal", "stop_mul": 1.8, "take_mul": 3.0},
 }
 
 TARGET_VOL = 0.15  # 目标年化波动率 15%
@@ -205,7 +205,7 @@ def calc_stop_take(ind):
     return stop, take
 
 
-def select_portfolio(day_idx, history_map, base_k, target_pos, top_n=6, top_sectors=2):
+def select_portfolio(day_idx, history_map, base_k, target_pos, top_n=10, top_sectors=2):
     regime = detect_regime(base_k, day_idx)
     params = REGIME_PARAMS.get(regime, REGIME_PARAMS["中性"])
 
