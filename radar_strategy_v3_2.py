@@ -437,6 +437,7 @@ def build_report(market_regime, target_pos, selected, analyzed_count):
 
     text = "\n".join(lines)
     data = {
+        "version": "V3.2",
         "generated_at": datetime.datetime.now(BEIJING_TZ).isoformat(),
         "date": today,
         "market_regime": market_regime,
@@ -491,7 +492,7 @@ def main():
     if args.notify:
         try:
             import notify
-            notify.send(f"ETF雷达V3.1 {data['date']} 仓位{target_pos:.0%}", report)
+            notify.send(f"ETF雷达V3.2 {data['date']} 仓位{target_pos:.0%}", report)
         except Exception as e:
             log(f"推送失败: {e}")
 
