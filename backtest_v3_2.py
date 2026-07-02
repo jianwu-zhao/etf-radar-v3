@@ -41,11 +41,11 @@ SINGLE_MAX = 0.20
 SINGLE_MIN = 0.05
 
 REGIME_PARAMS = {
-    "强多": {"target": 0.95, "rsi_max": 70, "score_thr": 45, "momentum": "strong", "stop_mul": 1.8, "take_mul": 3.5},
-    "偏多": {"target": 0.85, "rsi_max": 60, "score_thr": 45, "momentum": "balanced", "stop_mul": 2.0, "take_mul": 3.0},
-    "中性": {"target": 0.50, "rsi_max": 50, "score_thr": 50, "momentum": "balanced", "stop_mul": 2.2, "take_mul": 2.8},
-    "偏空": {"target": 0.35, "rsi_max": 45, "score_thr": 55, "momentum": "reversal", "stop_mul": 2.5, "take_mul": 2.5},
-    "强空": {"target": 0.10, "rsi_max": 40, "score_thr": 60, "momentum": "reversal", "stop_mul": 2.5, "take_mul": 2.5},
+    "强多": {"target": 0.95, "rsi_max": 70, "score_thr": 45, "momentum": "strong", "stop_mul": 2.2, "take_mul": 4.0},
+    "偏多": {"target": 0.85, "rsi_max": 60, "score_thr": 45, "momentum": "balanced", "stop_mul": 2.2, "take_mul": 4.0},
+    "中性": {"target": 0.50, "rsi_max": 50, "score_thr": 50, "momentum": "balanced", "stop_mul": 2.2, "take_mul": 4.0},
+    "偏空": {"target": 0.35, "rsi_max": 45, "score_thr": 55, "momentum": "reversal", "stop_mul": 2.2, "take_mul": 4.0},
+    "强空": {"target": 0.10, "rsi_max": 40, "score_thr": 60, "momentum": "reversal", "stop_mul": 2.2, "take_mul": 4.0},
 }
 
 TARGET_VOL = 0.15  # 目标年化波动率 15%
