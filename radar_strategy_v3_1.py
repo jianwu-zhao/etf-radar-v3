@@ -16,7 +16,7 @@ import argparse
 import datetime
 from typing import List, Dict, Any
 
-from data_source import realtime_quote, daily_kline, fetch_etf_list, intraday_kline
+from data_source import realtime_quote, daily_kline, fetch_etf_list, intraday_kline, _batch_from_yahoo
 from etf_universe import EXPANDED_ETF
 from sector_map import CORE_SECTOR_MAP, sector_scores, sector_of
 from tech_indicators import analyze, intraday_signal

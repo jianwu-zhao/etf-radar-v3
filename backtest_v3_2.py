@@ -9,7 +9,7 @@ import math
 import argparse
 from collections import defaultdict
 
-from data_source import daily_kline
+from data_source import daily_kline, _batch_from_yahoo
 from etf_universe import EXPANDED_ETF, EXPANDED_ETF_TOP50
 from sector_map import CORE_SECTOR_MAP, sector_of
 from tech_indicators import analyze
@@ -299,6 +299,11 @@ def select_portfolio(day_idx, history_map, base_k, target_pos, top_n=6, top_sect
 def run_backtest(codes=EXPANDED_ETF, top_n=6, fee=0.0005):
     import time
     print("加载历史数据...")
+    try:
+        _batch_from_yahoo(codes, limit=500)
+        print("Yahoo 批量预加载完成")
+    except Exception as e:
+        print("Yahoo 批量预加载失败:", e)
     t0 = time.time()
     history_map = {}
     base_k = daily_kline("510300", limit=500)

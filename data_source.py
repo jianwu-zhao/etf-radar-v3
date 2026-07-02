@@ -129,6 +129,7 @@ def daily_kline(code, limit=500):
     yd = _daily_from_yahoo(code, limit)
     if yd:
         return yd
+    return []
 
     if AKSHARE_AVAILABLE:
         try:
@@ -183,6 +184,68 @@ def _yahoo_symbol(code):
     if code.startswith(("51", "58", "56", "50", "52")):
         return f"{code}.SS"
     return f"{code}.SZ"
+
+
+_YAHOO_CACHE = {}
+
+
+def _batch_from_yahoo(codes, limit=500):
+    """批量下载 Yahoo 数据"""
+    if not YF_AVAILABLE:
+        return {}
+    symbols = []
+    for code in codes:
+        if code in _YAHOO_CACHE:
+            continue
+        symbols.append(_yahoo_symbol(code))
+    if not symbols:
+        return {code: _YAHOO_CACHE[code][-limit:] for code in codes}
+    try:
+        print(f"批量下载 Yahoo: {len(symbols)} 只")
+        df = yf.download(symbols, period="2y", group_by="ticker", progress=False, threads=True)
+        if df is None or df.empty:
+            return {}
+        if len(symbols) == 1:
+            sym = symbols[0]
+            sub = df.reset_index()
+            out = []
+            for _, row in sub.iterrows():
+                if str(row["Date"]) == "NaT":
+                    continue
+                out.append({
+                    "date": row["Date"].strftime("%Y-%m-%d") if hasattr(row["Date"], "strftime") else str(row["Date"])[:10],
+                    "open": round(float(row["Open"]), 3),
+                    "close": round(float(row["Close"]), 3),
+                    "high": round(float(row["High"]), 3),
+                    "low": round(float(row["Low"]), 3),
+                    "volume": int(row["Volume"]),
+                    "amount": 0,
+                })
+            _YAHOO_CACHE[symbols[0].split(".")[0]] = out
+        else:
+            for sym in symbols:
+                code = sym.split(".")[0]
+                try:
+                    sub = df[sym].dropna().reset_index()
+                    out = []
+                    for _, row in sub.iterrows():
+                        if str(row["Date"]) == "NaT":
+                            continue
+                        out.append({
+                            "date": row["Date"].strftime("%Y-%m-%d") if hasattr(row["Date"], "strftime") else str(row["Date"])[:10],
+                            "open": round(float(row["Open"]), 3),
+                            "close": round(float(row["Close"]), 3),
+                            "high": round(float(row["High"]), 3),
+                            "low": round(float(row["Low"]), 3),
+                            "volume": int(row["Volume"]),
+                            "amount": 0,
+                        })
+                    _YAHOO_CACHE[code] = out
+                except Exception as e:
+                    print(f"  {code} yahoo batch failed: {e}")
+    except Exception as e:
+        print(f"Yahoo batch error: {e}")
+    return {code: _YAHOO_CACHE.get(code, [])[-limit:] for code in codes}
 
 
 def _daily_from_yahoo(code, limit=500):
