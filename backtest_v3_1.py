@@ -418,16 +418,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--top", type=int, default=6)
     ap.add_argument("--fee", type=float, default=0.0005)
+    ap.add_argument("--all", action="store_true", help="使用扩展 ETF 池")
     ap.add_argument("--all", action="store_true", help="使用全部ETF")
     args = ap.parse_args()
 
     codes = CORE_ETF
     if args.all:
-        try:
-            codes = [e["code"] for e in fetch_etf_list()]
-            print(f"使用全部 {len(codes)} 只 ETF")
-        except Exception as e:
-            print(f"获取全部ETF失败: {e}")
+        codes = EXPANDED_ETF
+        print(f"使用扩展池 {len(codes)} 只 ETF")
 
     import time
     t0 = time.time()

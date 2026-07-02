@@ -454,11 +454,17 @@ def main():
     ap.add_argument("--codes", help="指定 ETF 代码，逗号分隔")
     ap.add_argument("--top", type=int, default=6)
     ap.add_argument("--position", type=float, default=None)
+    ap.add_argument("--all", action="store_true", help="使用扩展 ETF 池（100+只）")
     ap.add_argument("--notify", action="store_true")
     ap.add_argument("--no-save", action="store_true")
     args = ap.parse_args()
 
-    codes = args.codes.split(",") if args.codes else CORE_ETF
+    if args.codes:
+        codes = args.codes.split(",")
+    elif args.all:
+        codes = EXPANDED_ETF
+    else:
+        codes = CORE_ETF
 
     log("开始获取大盘状态...")
     market_regime, auto_pos = detect_market_regime()
