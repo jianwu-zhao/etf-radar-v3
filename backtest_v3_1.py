@@ -419,6 +419,7 @@ def main():
     ap.add_argument("--top", type=int, default=6)
     ap.add_argument("--fee", type=float, default=0.0005)
     ap.add_argument("--all", action="store_true", help="使用扩展 ETF 池")
+    ap.add_argument("--top50", action="store_true", help="使用扩展 ETF 池 Top 50")
     args = ap.parse_args()
 
     codes = CORE_ETF

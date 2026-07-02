@@ -11,6 +11,7 @@ permissions:
 jobs:
   backtest:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -20,8 +21,8 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Run backtest (90 ETFs)
-        run: python3 backtest_v3_1.py --all --top 8 --fee 0.0005
+      - name: Run backtest (expanded top 50)
+        run: python3 backtest_v3_1.py --top50 --top 8 --fee 0.0005
       - name: Commit result
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -30,5 +31,5 @@ jobs:
           git config user.email "bot@etf-radar.com"
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           git add reports/backtest_v3_1_result.json
-          git diff --cached --quiet || git commit -m "backtest: expanded etf universe"
+          git diff --cached --quiet || git commit -m "backtest: expanded top50 universe"
           git push || echo "push skipped"
