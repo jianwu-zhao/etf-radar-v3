@@ -20,7 +20,7 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
       - name: Grid search
-        run: python3 backtest_v3_2.py --grid --top 6 --fee 0.0005
+        run: python3 backtest_v3_2.py --grid --top 6 --fee 0.0005 2>&1 | tee reports/grid_search.log
       - name: Commit result
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -28,6 +28,12 @@ jobs:
           git config user.name "ETF Bot"
           git config user.email "bot@etf-radar.com"
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
-          git add reports/backtest_v3_2_result.json
+          git add reports/backtest_v3_2_result.json reports/grid_search.log
           git diff --cached --quiet || git commit -m "backtest: v3.2 grid result"
           git push || echo "push skipped"
+      - name: Upload log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: grid-search-log
+          path: reports/grid_search.log
