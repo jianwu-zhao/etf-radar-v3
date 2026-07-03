@@ -25,7 +25,7 @@ from datetime import timezone, timedelta
 BEIJING_TZ = timezone(timedelta(hours=8))
 
 HOME = os.path.expanduser("~")
-BASE = os.path.join(HOME, "etf-radar")
+BASE = os.path.dirname(os.path.abspath(__file__))
 REPORT_DIR = os.path.join(BASE, "reports")
 
 CORE_ETF = [
