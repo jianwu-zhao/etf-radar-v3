@@ -179,7 +179,11 @@ def daily_kline(code, limit=500):
            f"&fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13"
            f"&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61"
            f"&klt=101&fqt=1&end=20500101&lmt={limit}")
-    data = _request(url)
+    data = None
+    try:
+        data = _request(url)
+    except Exception as e:
+        print(f"  东财API失败({code}): {e}")
     if data and data.get("data"):
         klines = data["data"].get("klines", [])
         out = []
