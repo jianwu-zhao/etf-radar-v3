@@ -35,7 +35,9 @@ jobs:
         run: python3 radar_strategy_v3_2.py 2>&1
       - name: Generate dashboard
         run: |
-          # 找最新的 plan 文件（避免日期格式不一致问题）
+          echo "=== reports/ directory ==="
+          ls -la reports/
+          echo "=== Using latest plan ==="
           LATEST=$(ls -t reports/plan_v3_2_*.json 2>/dev/null | head -1)
           if [ -z "$LATEST" ]; then
             echo "No plan file found"
@@ -59,7 +61,7 @@ jobs:
           git config user.email "bot@etf-radar.com"
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           git add reports/ pages/ data_cache/
-          git diff --cached --quiet || (git commit -m "v3.2: daily plan $(TZ=Asia/Shanghai date +%Y%m%d)" && git push --force-with-lease)
+          git diff --cached --quiet || (git commit -m "v3.2: daily plan $(TZ=Asia/Shanghai date +%Y%m%d)" && git pull --rebase && git push --force-with-lease)
           echo "commit done"
       - name: Telegram notify
         continue-on-error: true
