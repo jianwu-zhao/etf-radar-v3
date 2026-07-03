@@ -133,33 +133,24 @@ def _load_cache():
 
 def daily_kline(code, limit=500):
     """日K线"""
-    # 优先读取缓存
+    # 0. 先检查缓存是否包含今天的数据
     cache = _load_cache()
     if code in cache and cache[code]:
-        # 检查缓存是否为最新交易日数据
         latest = cache[code][-1].get("date", "")
-        today_dt = datetime.now()
-        # 如果缓存最新日期超过1个日历日，强制刷新
-        if latest:
+        if latest and "-" in latest:
             try:
-                from datetime import timedelta
-                latest_dt = datetime.strptime(latest.replace("-", "")[:8], "%Y%m%d") if "-" in latest else datetime.strptime(latest[:8], "%Y%m%d")
-                if (today_dt - latest_dt).days > 1:
-                    print(f"  缓存过期({latest})，强制刷新 {code}")
-                    # 缓存过期，走 Yahoo 下载
-                    yd = _daily_from_yahoo(code, limit)
-                    if yd:
-                        return yd
+                latest_dt = datetime.strptime(latest[:10], "%Y-%m-%d")
+                today_dt = datetime.now()
+                # 缓存日期 >= 今天，直接用（不重复下载）
+                if latest_dt.date() >= today_dt.date():
+                    return cache[code][-limit:]
+                # 缓存日期 == 昨天但现在是交易时段，也先用缓存
+                if latest_dt.date() == (today_dt - __import__('datetime').timedelta(days=1)).date() and today_dt.hour < 8:
+                    return cache[code][-limit:]
             except:
                 pass
-        return cache[code][-limit:]
 
-    # Yahoo Finance
-    yd = _daily_from_yahoo(code, limit)
-    if yd:
-        return yd
-    return []
-
+    # 1. 优选用 akshare（东方财富旗下，数据最新，A股实时）
     if AKSHARE_AVAILABLE:
         try:
             end = datetime.now().strftime("%Y%m%d")
@@ -189,23 +180,30 @@ def daily_kline(code, limit=500):
            f"&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61"
            f"&klt=101&fqt=1&end=20500101&lmt={limit}")
     data = _request(url)
-    klines = data.get("data", {}).get("klines", [])
-    out = []
-    for k in klines:
-        parts = k.split(",")
-        if len(parts) >= 6:
-            out.append({
-                "date": parts[0],
-                "open": round(float(parts[1]), 3),
-                "close": round(float(parts[2]), 3),
-                "high": round(float(parts[3]), 3),
-                "low": round(float(parts[4]), 3),
-                "volume": int(parts[5]),
-                "amount": float(parts[6]) if len(parts) > 6 else 0,
-                "amplitude": float(parts[7]) if len(parts) > 7 else 0,
-                "change_pct": float(parts[8]) if len(parts) > 8 else 0,
-            })
-    return out
+    if data and data.get("data"):
+        klines = data["data"].get("klines", [])
+        out = []
+        for k in klines:
+            parts = k.split(",")
+            if len(parts) >= 6:
+                out.append({
+                    "date": parts[0],
+                    "open": round(float(parts[1]), 3),
+                    "close": round(float(parts[2]), 3),
+                    "high": round(float(parts[3]), 3),
+                    "low": round(float(parts[4]), 3),
+                    "volume": int(parts[5]),
+                    "amount": float(parts[6]) if len(parts) > 6 else 0,
+                    "amplitude": float(parts[7]) if len(parts) > 7 else 0,
+                    "change_pct": float(parts[8]) if len(parts) > 8 else 0,
+                })
+        return out
+    
+    # 最后兜底：Yahoo Finance
+    yd = _daily_from_yahoo(code, limit)
+    if yd:
+        return yd
+    return []
 
 
 def _yahoo_symbol(code):
@@ -290,14 +288,22 @@ def _batch_from_yahoo(codes, limit=500):
 
 
 def _daily_from_yahoo(code, limit=500):
-    """从 Yahoo Finance 获取日K线"""
+    """从 Yahoo Finance 获取日K线（强制下载不读旧缓存）"""
     if not YF_AVAILABLE:
         return None
+    # 强制从 Yahoo 下载，不读缓存（因为 Yahoo 数据可能滞后）
+    # 但如果内存已有今天数据，直接用
     if code in _YAHOO_CACHE and _YAHOO_CACHE[code]:
-        return _YAHOO_CACHE[code][-limit:]
-    cache = _load_cache()
-    if code in cache and cache[code]:
-        return cache[code][-limit:]
+        latest = _YAHOO_CACHE[code][-1].get("date", "")
+        if latest:
+            try:
+                if "-" in latest:
+                    latest_dt = datetime.strptime(latest[:10], "%Y-%m-%d")
+                    today_dt = datetime.now()
+                    if latest_dt.date() >= today_dt.date():
+                        return _YAHOO_CACHE[code][-limit:]
+            except:
+                pass
     symbol = _yahoo_symbol(code)
     try:
         ticker = yf.Ticker(symbol)
