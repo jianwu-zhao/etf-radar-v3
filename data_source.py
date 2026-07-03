@@ -136,9 +136,25 @@ def daily_kline(code, limit=500):
     # 优先读取缓存
     cache = _load_cache()
     if code in cache and cache[code]:
+        # 检查缓存是否为最新交易日数据
+        latest = cache[code][-1].get("date", "")
+        today_dt = datetime.now()
+        # 如果缓存最新日期超过1个日历日，强制刷新
+        if latest:
+            try:
+                from datetime import timedelta
+                latest_dt = datetime.strptime(latest.replace("-", "")[:8], "%Y%m%d") if "-" in latest else datetime.strptime(latest[:8], "%Y%m%d")
+                if (today_dt - latest_dt).days > 1:
+                    print(f"  缓存过期({latest})，强制刷新 {code}")
+                    # 缓存过期，走 Yahoo 下载
+                    yd = _daily_from_yahoo(code, limit)
+                    if yd:
+                        return yd
+            except:
+                pass
         return cache[code][-limit:]
 
-    # 优先 Yahoo Finance（GitHub Actions 可用）
+    # Yahoo Finance
     yd = _daily_from_yahoo(code, limit)
     if yd:
         return yd
