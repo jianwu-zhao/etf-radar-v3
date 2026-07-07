@@ -75,7 +75,7 @@
 <body>
     <div class="container">
         <h1>📡 ETF 波段雷达 V3.1</h1>
-        <div class="sub">更新：20260706　大盘：强多　建议仓位：95%　扫描：30只</div>
+        <div class="sub">更新：20260707　大盘：偏空　建议仓位：35%　扫描：30只</div>
 
         
     <details class="guide">
@@ -132,10 +132,10 @@
     
 
         <div class="grid">
-            <div class="card"><div class="label">目标仓位</div><div class="value">95%</div></div>
-            <div class="card"><div class="label">ETF 仓位</div><div class="value">60.0%</div></div>
-            <div class="card"><div class="label">现金</div><div class="value">40.0%</div></div>
-            <div class="card"><div class="label">入选标的</div><div class="value">3</div></div>
+            <div class="card"><div class="label">目标仓位</div><div class="value">35%</div></div>
+            <div class="card"><div class="label">ETF 仓位</div><div class="value">8.0%</div></div>
+            <div class="card"><div class="label">现金</div><div class="value">92.0%</div></div>
+            <div class="card"><div class="label">入选标的</div><div class="value">1</div></div>
         </div>
 
         <div class="chart-row">
@@ -179,56 +179,20 @@
                 
         <tr>
             <td>1</td>
-            <td class="name"><b>芯片国泰</b><br><small>512760</small></td>
-            <td class="name"><small>芯片</small></td>
-            <td><span class="badge buy">可买</span></td>
-            <td class="sig"></td>
-            <td class="sig">MACD红柱 · RSI中性 · 跌破MA5</td>
-            <td class="score grade-s">68.0</td>
-            <td>0.0022</td>
-            <td>+24.8%</td>
-            <td>64.1%</td>
-            <td><b>RSI58</b><br><small>ATR0.080</small></td>
-            <td class="up">+81.3%</td>
-            <td class="up">+26.0%</td>
-            <td class="up">+0.64%</td>
-            <td class="plan">回踩 1.313<br>止盈 1.652<br>仓位 20.0%</td>
-        </tr>
-        
-        <tr>
-            <td>2</td>
-            <td class="name"><b>科创50华夏</b><br><small>588000</small></td>
-            <td class="name"><small>宽基</small></td>
-            <td><span class="badge buy">可买</span></td>
-            <td class="sig"></td>
-            <td class="sig">MACD红柱 · RSI中性 · 跌破MA5</td>
-            <td class="score grade-s">68.0</td>
-            <td>0.0023</td>
-            <td>+17.6%</td>
-            <td>64.8%</td>
-            <td><b>RSI57</b><br><small>ATR0.106</small></td>
-            <td class="up">+57.7%</td>
-            <td class="up">+20.0%</td>
-            <td class="up">+0.67%</td>
-            <td class="plan">回踩 1.968<br>止盈 2.434<br>仓位 20.0%</td>
-        </tr>
-        
-        <tr>
-            <td>3</td>
             <td class="name"><b>芯片华夏</b><br><small>159995</small></td>
             <td class="name"><small>芯片</small></td>
-            <td><span class="badge buy">可买</span></td>
+            <td><span class="badge watch">超卖观察</span></td>
             <td class="sig"></td>
-            <td class="sig">MACD绿柱 · RSI中性 · 跌破MA5</td>
-            <td class="score grade-s">61.0</td>
-            <td>-0.0020</td>
-            <td>+25.1%</td>
-            <td>63.2%</td>
-            <td><b>RSI58</b><br><small>ATR0.186</small></td>
-            <td class="up">+83.2%</td>
-            <td class="up">+25.2%</td>
-            <td class="up">+0.30%</td>
-            <td class="plan">回踩 2.798<br>止盈 3.567<br>仓位 20.0%</td>
+            <td class="sig">MACD绿柱 · RSI超卖 · 布林下轨 · 跌破MA5</td>
+            <td class="score grade-s">63.0</td>
+            <td>-0.1100</td>
+            <td>-37.5%</td>
+            <td>-23.7%</td>
+            <td><b>RSI26</b><br><small>ATR0.292</small></td>
+            <td class="down">-13.9%</td>
+            <td class="down">-34.5%</td>
+            <td class="down">-0.27%</td>
+            <td class="plan">回踩 1.396<br>止盈 2.377<br>仓位 8.0%</td>
         </tr>
         
             </tbody>
@@ -247,7 +211,7 @@
 
         <div class="footer">
             本工具仅做策略信号计算，不构成投资建议，不自动下单。<br>
-            数据源：东方财富 API · 生成时间 2026-07-06 20:18:14
+            数据源：东方财富 API · 生成时间 2026-07-07 19:03:00
         </div>
     </div>
 
@@ -336,7 +300,7 @@ if (dates.length > 0 && document.getElementById('drawdownChart')) {
 
 // 3. 行业轮动热度
 if (document.getElementById('sectorChart')) {
-    const sectors = {"labels": ["芯片", "宽基"], "scores": [84.6, 83.7]};
+    const sectors = {"labels": ["芯片"], "scores": [63.0]};
     if (sectors.labels && sectors.labels.length > 0) {
         new Chart(document.getElementById('sectorChart'), {
             type: 'bar',
