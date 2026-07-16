@@ -75,7 +75,7 @@
 <body>
     <div class="container">
         <h1>📡 ETF 波段雷达 V3.1</h1>
-        <div class="sub">更新：20260715　大盘：偏空　建议仓位：35%　扫描：30只</div>
+        <div class="sub">更新：20260716　大盘：偏空　建议仓位：35%　扫描：30只</div>
 
         
     <details class="guide">
@@ -133,9 +133,9 @@
 
         <div class="grid">
             <div class="card"><div class="label">目标仓位</div><div class="value">35%</div></div>
-            <div class="card"><div class="label">ETF 仓位</div><div class="value">8.0%</div></div>
-            <div class="card"><div class="label">现金</div><div class="value">92.0%</div></div>
-            <div class="card"><div class="label">入选标的</div><div class="value">1</div></div>
+            <div class="card"><div class="label">ETF 仓位</div><div class="value">27.2%</div></div>
+            <div class="card"><div class="label">现金</div><div class="value">72.8%</div></div>
+            <div class="card"><div class="label">入选标的</div><div class="value">3</div></div>
         </div>
 
         <div class="chart-row">
@@ -179,20 +179,56 @@
                 
         <tr>
             <td>1</td>
-            <td class="name"><b>芯片华夏</b><br><small>159995</small></td>
-            <td class="name"><small>芯片</small></td>
+            <td class="name"><b>钢铁国泰</b><br><small>515210</small></td>
+            <td class="name"><small>钢铁</small></td>
+            <td><span class="badge confirm">确认买</span></td>
+            <td class="sig"></td>
+            <td class="sig">MACD红柱 · 站上MA5</td>
+            <td class="score grade-a">53.0</td>
+            <td>0.0037</td>
+            <td>-11.9%</td>
+            <td>30.9%</td>
+            <td><b>RSI38</b><br><small>ATR0.029</small></td>
+            <td class="down">-23.2%</td>
+            <td class="down">-7.0%</td>
+            <td class="down">-0.96%</td>
+            <td class="plan">回踩 1.076<br>止盈 1.221<br>仓位 11.2%</td>
+        </tr>
+        
+        <tr>
+            <td>2</td>
+            <td class="name"><b>中证1000南方</b><br><small>512100</small></td>
+            <td class="name"><small>宽基</small></td>
             <td><span class="badge watch">超卖观察</span></td>
             <td class="sig"></td>
             <td class="sig">MACD绿柱 · RSI超卖 · 布林下轨 · 跌破MA5</td>
             <td class="score grade-a">58.0</td>
-            <td>-0.1845</td>
-            <td>-41.1%</td>
-            <td>13.3%</td>
-            <td><b>RSI28</b><br><small>ATR0.272</small></td>
-            <td class="down">-23.9%</td>
-            <td class="down">-44.9%</td>
-            <td class="down">-5.67%</td>
-            <td class="plan">回踩 1.299<br>止盈 2.213<br>仓位 8.0%</td>
+            <td>-0.0422</td>
+            <td>-9.6%</td>
+            <td>-1.8%</td>
+            <td><b>RSI32</b><br><small>ATR0.102</small></td>
+            <td class="down">-7.2%</td>
+            <td class="down">-12.1%</td>
+            <td class="down">-2.43%</td>
+            <td class="plan">回踩 2.888<br>止盈 3.398<br>仓位 8.0%</td>
+        </tr>
+        
+        <tr>
+            <td>3</td>
+            <td class="name"><b>创业板易方达</b><br><small>159915</small></td>
+            <td class="name"><small>宽基</small></td>
+            <td><span class="badge watch">超卖观察</span></td>
+            <td class="sig"></td>
+            <td class="sig">MACD绿柱 · 布林下轨 · 跌破MA5</td>
+            <td class="score grade-a">55.0</td>
+            <td>-0.0490</td>
+            <td>-6.1%</td>
+            <td>8.7%</td>
+            <td><b>RSI40</b><br><small>ATR0.165</small></td>
+            <td class="up">+1.4%</td>
+            <td class="down">-11.0%</td>
+            <td class="down">-2.74%</td>
+            <td class="plan">回踩 3.462<br>止盈 4.218<br>仓位 8.0%</td>
         </tr>
         
             </tbody>
@@ -211,7 +247,7 @@
 
         <div class="footer">
             本工具仅做策略信号计算，不构成投资建议，不自动下单。<br>
-            数据源：东方财富 API · 生成时间 2026-07-15 17:56:23
+            数据源：东方财富 API · 生成时间 2026-07-16 18:04:46
         </div>
     </div>
 
@@ -300,7 +336,7 @@ if (dates.length > 0 && document.getElementById('drawdownChart')) {
 
 // 3. 行业轮动热度
 if (document.getElementById('sectorChart')) {
-    const sectors = {"labels": ["芯片"], "scores": [58.0]};
+    const sectors = {"labels": ["宽基", "钢铁"], "scores": [56.5, 53.0]};
     if (sectors.labels && sectors.labels.length > 0) {
         new Chart(document.getElementById('sectorChart'), {
             type: 'bar',
