@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-07-23T18:27:20.833609+08:00",
+  "date": "20260723",
+  "market_regime": "偏空",
+  "target_position": 0.35,
+  "etf_total": 0.2,
+  "cash": 0.8,
+  "positions": [
+    {
+      "code": "512980",
+      "name": "传媒广发",
+      "price": 0.769,
+      "change_pct": -1.41,
+      "rsi14": 38.08,
+      "rsi6": 34.5,
+      "ma5": 0.784,
+      "ma10": 0.799,
+      "ma20": 0.806,
+      "ma60": 0.882,
+      "momentum_20": -7.01,
+      "momentum_60": -22.95,
+      "volatility_20": 1.88,
+      "volume_ratio": 1.1,
+      "relative_strength": -1.84,
+      "macd": {
+        "macd": -0.02,
+        "signal": -0.0201,
+        "histogram": 0.0001
+      },
+      "bollinger": {
+        "middle": 0.806,
+        "upper": 0.842,
+        "lower": 0.77,
+        "width": 0.071,
+        "percent_b": -2.05
+      },
+      "atr14": 0.033,
+      "score": 60,
+      "action": "可买",
+      "stop": 0.715,
+      "take_profit": 0.868,
+      "theme": "传媒互联",
+      "sector": "传媒互联",
+      "weight": 0.2,
+      "intra_signal": "unknown",
+      "intra_rsi14": null,
+      "intra_macd_hist": 0
+    }
+  ],
+  "all_scanned": 30
+}
