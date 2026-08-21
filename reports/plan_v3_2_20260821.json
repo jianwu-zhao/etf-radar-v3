@@ -1,0 +1,91 @@
+{
+  "generated_at": "2026-08-21T16:31:51.063747+08:00",
+  "date": "20260821",
+  "market_regime": "偏空",
+  "target_position": 0.35,
+  "etf_total": 0.35,
+  "cash": 0.65,
+  "positions": [
+    {
+      "code": "512760",
+      "name": "芯片国泰",
+      "price": 1.104,
+      "change_pct": 0.45,
+      "rsi14": 43.05,
+      "rsi6": 37.94,
+      "ma5": 1.153,
+      "ma10": 1.152,
+      "ma20": 1.129,
+      "ma60": 1.237,
+      "momentum_20": -7.92,
+      "momentum_60": -10.02,
+      "volatility_20": 3.11,
+      "volume_ratio": 0.51,
+      "relative_strength": -5.69,
+      "macd": {
+        "macd": -0.0264,
+        "signal": -0.0339,
+        "histogram": 0.0075
+      },
+      "bollinger": {
+        "middle": 1.129,
+        "upper": 1.244,
+        "lower": 1.014,
+        "width": 0.229,
+        "percent_b": 39.17
+      },
+      "atr14": 0.056,
+      "score": 58,
+      "action": "可买",
+      "stop": 1.027,
+      "take_profit": 1.272,
+      "theme": "其他",
+      "sector": "芯片",
+      "weight": 0.1796,
+      "intra_signal": "unknown",
+      "intra_rsi14": null,
+      "intra_macd_hist": 0
+    },
+    {
+      "code": "159995",
+      "name": "芯片华夏",
+      "price": 1.159,
+      "change_pct": 0.7,
+      "rsi14": 36.26,
+      "rsi6": 37.93,
+      "ma5": 1.21,
+      "ma10": 1.206,
+      "ma20": 1.18,
+      "ma60": 1.926,
+      "momentum_20": -8.16,
+      "momentum_60": -55.95,
+      "volatility_20": 3.18,
+      "volume_ratio": 0.59,
+      "relative_strength": -5.93,
+      "macd": {
+        "macd": -0.1352,
+        "signal": -0.1828,
+        "histogram": 0.0477
+      },
+      "bollinger": {
+        "middle": 1.18,
+        "upper": 1.305,
+        "lower": 1.056,
+        "width": 0.249,
+        "percent_b": 41.43
+      },
+      "atr14": 0.059,
+      "score": 55,
+      "action": "可买",
+      "stop": 1.078,
+      "take_profit": 1.336,
+      "theme": "其他",
+      "sector": "芯片",
+      "weight": 0.1704,
+      "intra_signal": "unknown",
+      "intra_rsi14": null,
+      "intra_macd_hist": 0
+    }
+  ],
+  "all_scanned": 30
+}
