@@ -75,7 +75,7 @@
 <body>
     <div class="container">
         <h1>📡 ETF 波段雷达 V3.1</h1>
-        <div class="sub">更新：20260821　大盘：偏空　建议仓位：35%　扫描：30只</div>
+        <div class="sub">更新：20260824　大盘：偏空　建议仓位：35%　扫描：30只</div>
 
         
     <details class="guide">
@@ -133,9 +133,9 @@
 
         <div class="grid">
             <div class="card"><div class="label">目标仓位</div><div class="value">35%</div></div>
-            <div class="card"><div class="label">ETF 仓位</div><div class="value">35.0%</div></div>
-            <div class="card"><div class="label">现金</div><div class="value">65.0%</div></div>
-            <div class="card"><div class="label">入选标的</div><div class="value">2</div></div>
+            <div class="card"><div class="label">ETF 仓位</div><div class="value">20.0%</div></div>
+            <div class="card"><div class="label">现金</div><div class="value">80.0%</div></div>
+            <div class="card"><div class="label">入选标的</div><div class="value">1</div></div>
         </div>
 
         <div class="chart-row">
@@ -179,38 +179,20 @@
                 
         <tr>
             <td>1</td>
-            <td class="name"><b>芯片国泰</b><br><small>512760</small></td>
-            <td class="name"><small>芯片</small></td>
-            <td><span class="badge buy">可买</span></td>
-            <td class="sig"></td>
-            <td class="sig">MACD红柱 · RSI中性 · 跌破MA5</td>
-            <td class="score grade-a">58.0</td>
-            <td>0.0075</td>
-            <td>-10.8%</td>
-            <td>39.2%</td>
-            <td><b>RSI43</b><br><small>ATR0.056</small></td>
-            <td class="down">-10.0%</td>
-            <td class="down">-7.9%</td>
-            <td class="up">+0.45%</td>
-            <td class="plan">回踩 1.027<br>止盈 1.272<br>仓位 18.0%</td>
-        </tr>
-        
-        <tr>
-            <td>2</td>
             <td class="name"><b>芯片华夏</b><br><small>159995</small></td>
             <td class="name"><small>芯片</small></td>
             <td><span class="badge buy">可买</span></td>
             <td class="sig"></td>
-            <td class="sig">MACD红柱 · 跌破MA5</td>
-            <td class="score grade-a">55.0</td>
-            <td>0.0477</td>
-            <td>-39.8%</td>
-            <td>41.4%</td>
-            <td><b>RSI36</b><br><small>ATR0.059</small></td>
-            <td class="down">-56.0%</td>
-            <td class="down">-8.2%</td>
-            <td class="up">+0.70%</td>
-            <td class="plan">回踩 1.078<br>止盈 1.336<br>仓位 17.0%</td>
+            <td class="sig">MACD红柱 · RSI超卖 · 跌破MA5</td>
+            <td class="score grade-s">63.0</td>
+            <td>0.0369</td>
+            <td>-40.6%</td>
+            <td>27.6%</td>
+            <td><b>RSI34</b><br><small>ATR0.055</small></td>
+            <td class="down">-55.2%</td>
+            <td class="down">-12.6%</td>
+            <td class="down">-3.62%</td>
+            <td class="plan">回踩 1.039<br>止盈 1.282<br>仓位 20.0%</td>
         </tr>
         
             </tbody>
@@ -229,7 +211,7 @@
 
         <div class="footer">
             本工具仅做策略信号计算，不构成投资建议，不自动下单。<br>
-            数据源：东方财富 API · 生成时间 2026-08-21 16:31:51
+            数据源：东方财富 API · 生成时间 2026-08-24 16:35:12
         </div>
     </div>
 
@@ -318,7 +300,7 @@ if (dates.length > 0 && document.getElementById('drawdownChart')) {
 
 // 3. 行业轮动热度
 if (document.getElementById('sectorChart')) {
-    const sectors = {"labels": ["芯片"], "scores": [56.5]};
+    const sectors = {"labels": ["芯片"], "scores": [63.0]};
     if (sectors.labels && sectors.labels.length > 0) {
         new Chart(document.getElementById('sectorChart'), {
             type: 'bar',
