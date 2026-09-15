@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-09-15T21:16:21.988346+08:00",
+  "date": "20260915",
+  "market_regime": "强空",
+  "target_position": 0.1,
+  "etf_total": 0.1,
+  "cash": 0.9,
+  "positions": [
+    {
+      "code": "159995",
+      "name": "芯片华夏",
+      "price": 1.077,
+      "change_pct": 1.99,
+      "rsi14": 35.46,
+      "rsi6": 30.04,
+      "ma5": 1.091,
+      "ma10": 1.104,
+      "ma20": 1.132,
+      "ma60": 1.533,
+      "momentum_20": -14.73,
+      "momentum_60": -63.12,
+      "volatility_20": 1.84,
+      "volume_ratio": 0.92,
+      "relative_strength": -9.21,
+      "macd": {
+        "macd": -0.0645,
+        "signal": -0.0765,
+        "histogram": 0.012
+      },
+      "bollinger": {
+        "middle": 1.132,
+        "upper": 1.217,
+        "lower": 1.047,
+        "width": 0.17,
+        "percent_b": 17.47
+      },
+      "atr14": 0.038,
+      "score": 60,
+      "action": "可买",
+      "stop": 1.002,
+      "take_profit": 1.191,
+      "theme": "其他",
+      "sector": "芯片",
+      "weight": 0.1,
+      "intra_signal": "unknown",
+      "intra_rsi14": null,
+      "intra_macd_hist": 0
+    }
+  ],
+  "all_scanned": 30
+}

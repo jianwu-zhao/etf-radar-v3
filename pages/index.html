@@ -75,7 +75,7 @@
 <body>
     <div class="container">
         <h1>📡 ETF 波段雷达 V3.1</h1>
-        <div class="sub">更新：20260914　大盘：强空　建议仓位：10%　扫描：30只</div>
+        <div class="sub">更新：20260915　大盘：强空　建议仓位：10%　扫描：30只</div>
 
         
     <details class="guide">
@@ -183,16 +183,16 @@
             <td class="name"><small>芯片</small></td>
             <td><span class="badge buy">可买</span></td>
             <td class="sig"></td>
-            <td class="sig">MACD红柱 · RSI超卖 · 布林下轨 · 跌破MA5</td>
-            <td class="score grade-a">55.0</td>
-            <td>0.0107</td>
-            <td>-31.1%</td>
-            <td>7.3%</td>
-            <td><b>RSI34</b><br><small>ATR0.037</small></td>
-            <td class="down">-63.8%</td>
-            <td class="down">-16.4%</td>
-            <td class="down">-1.95%</td>
-            <td class="plan">回踩 0.982<br>止盈 1.167<br>仓位 10.0%</td>
+            <td class="sig">MACD红柱 · 布林下轨 · 跌破MA5</td>
+            <td class="score grade-s">60.0</td>
+            <td>0.0120</td>
+            <td>-29.7%</td>
+            <td>17.5%</td>
+            <td><b>RSI35</b><br><small>ATR0.038</small></td>
+            <td class="down">-63.1%</td>
+            <td class="down">-14.7%</td>
+            <td class="up">+1.99%</td>
+            <td class="plan">回踩 1.002<br>止盈 1.191<br>仓位 10.0%</td>
         </tr>
         
             </tbody>
@@ -211,7 +211,7 @@
 
         <div class="footer">
             本工具仅做策略信号计算，不构成投资建议，不自动下单。<br>
-            数据源：东方财富 API · 生成时间 2026-09-14 22:49:57
+            数据源：东方财富 API · 生成时间 2026-09-15 21:16:22
         </div>
     </div>
 
@@ -300,7 +300,7 @@ if (dates.length > 0 && document.getElementById('drawdownChart')) {
 
 // 3. 行业轮动热度
 if (document.getElementById('sectorChart')) {
-    const sectors = {"labels": ["芯片"], "scores": [55.0]};
+    const sectors = {"labels": ["芯片"], "scores": [60.0]};
     if (sectors.labels && sectors.labels.length > 0) {
         new Chart(document.getElementById('sectorChart'), {
             type: 'bar',
