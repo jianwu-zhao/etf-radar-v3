@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-09-24T21:01:09.146235+08:00",
+  "date": "20260924",
+  "market_regime": "强空",
+  "target_position": 0.1,
+  "etf_total": 0.1,
+  "cash": 0.9,
+  "positions": [
+    {
+      "code": "515790",
+      "name": "515790",
+      "price": 0.792,
+      "change_pct": -3.06,
+      "rsi14": 39.08,
+      "rsi6": 35.99,
+      "ma5": 0.807,
+      "ma10": 0.802,
+      "ma20": 0.812,
+      "ma60": 0.842,
+      "momentum_20": -6.93,
+      "momentum_60": -22.66,
+      "volatility_20": 1.0,
+      "volume_ratio": 0.93,
+      "relative_strength": -3.18,
+      "macd": {
+        "macd": -0.012,
+        "signal": -0.0137,
+        "histogram": 0.0018
+      },
+      "bollinger": {
+        "middle": 0.812,
+        "upper": 0.846,
+        "lower": 0.779,
+        "width": 0.067,
+        "percent_b": 19.44
+      },
+      "atr14": 0.016,
+      "score": 55,
+      "action": "可买",
+      "stop": 0.76,
+      "take_profit": 0.84,
+      "theme": "新能源链",
+      "sector": "新能源",
+      "weight": 0.1,
+      "intra_signal": "unknown",
+      "intra_rsi14": null,
+      "intra_macd_hist": 0
+    }
+  ],
+  "all_scanned": 30
+}
