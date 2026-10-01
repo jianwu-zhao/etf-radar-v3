@@ -1,10 +1,51 @@
 {
-  "generated_at": "2026-09-30T22:20:25.691322+08:00",
+  "generated_at": "2026-10-01T22:54:10.931481+08:00",
   "date": "20260930",
   "market_regime": "强空",
   "target_position": 0.1,
-  "etf_total": 0,
-  "cash": 1,
-  "positions": [],
+  "etf_total": 0.1,
+  "cash": 0.9,
+  "positions": [
+    {
+      "code": "512760",
+      "name": "512760",
+      "price": 1.012,
+      "change_pct": NaN,
+      "rsi14": 38.95,
+      "rsi6": 28.45,
+      "ma5": 1.056,
+      "ma10": 1.072,
+      "ma20": 1.057,
+      "ma60": 1.136,
+      "momentum_20": -7.24,
+      "momentum_60": -28.02,
+      "volatility_20": 1.79,
+      "volume_ratio": 0.95,
+      "relative_strength": -1.86,
+      "macd": {
+        "macd": -0.0156,
+        "signal": -0.0158,
+        "histogram": 0.0001
+      },
+      "bollinger": {
+        "middle": 1.057,
+        "upper": 1.12,
+        "lower": 0.994,
+        "width": 0.125,
+        "percent_b": 14.14
+      },
+      "atr14": 0.034,
+      "score": 60,
+      "action": "可买",
+      "stop": 0.944,
+      "take_profit": 1.114,
+      "theme": "其他",
+      "sector": "芯片",
+      "weight": 0.1,
+      "intra_signal": "unknown",
+      "intra_rsi14": null,
+      "intra_macd_hist": 0
+    }
+  ],
   "all_scanned": 30
 }
