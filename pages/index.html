@@ -75,7 +75,7 @@
 <body>
     <div class="container">
         <h1>📡 ETF 波段雷达 V3.1</h1>
-        <div class="sub">更新：20261019　大盘：强空　建议仓位：10%　扫描：30只</div>
+        <div class="sub">更新：20261020　大盘：强空　建议仓位：10%　扫描：30只</div>
 
         
     <details class="guide">
@@ -181,18 +181,18 @@
             <td>1</td>
             <td class="name"><b>510500</b><br><small>510500</small></td>
             <td class="name"><small>宽基</small></td>
-            <td><span class="badge buy">可买</span></td>
+            <td><span class="badge confirm">确认买</span></td>
             <td class="sig"></td>
-            <td class="sig">MACD绿柱 · RSI超卖 · 布林下轨 · 跌破MA5</td>
-            <td class="score grade-s">68.0</td>
-            <td>-0.0713</td>
-            <td>-10.8%</td>
-            <td>8.6%</td>
-            <td><b>RSI23</b><br><small>ATR0.177</small></td>
-            <td class="down">-9.0%</td>
-            <td class="down">-10.3%</td>
-            <td class="up">+0.31%</td>
-            <td class="plan">回踩 6.476<br>止盈 7.361<br>仓位 5.2%</td>
+            <td class="sig">MACD绿柱 · RSI超卖 · 布林下轨 · 站上MA5</td>
+            <td class="score grade-s">63.0</td>
+            <td>-0.0600</td>
+            <td>-10.2%</td>
+            <td>15.6%</td>
+            <td><b>RSI26</b><br><small>ATR0.181</small></td>
+            <td class="down">-7.5%</td>
+            <td class="down">-9.6%</td>
+            <td class="up">+0.60%</td>
+            <td class="plan">回踩 6.509<br>止盈 7.414<br>仓位 5.2%</td>
         </tr>
         
             </tbody>
@@ -211,7 +211,7 @@
 
         <div class="footer">
             本工具仅做策略信号计算，不构成投资建议，不自动下单。<br>
-            数据源：东方财富 API · 生成时间 2026-10-19 23:08:09
+            数据源：东方财富 API · 生成时间 2026-10-20 21:04:19
         </div>
     </div>
 
@@ -300,7 +300,7 @@ if (dates.length > 0 && document.getElementById('drawdownChart')) {
 
 // 3. 行业轮动热度
 if (document.getElementById('sectorChart')) {
-    const sectors = {"labels": ["宽基"], "scores": [68.0]};
+    const sectors = {"labels": ["宽基"], "scores": [63.0]};
     if (sectors.labels && sectors.labels.length > 0) {
         new Chart(document.getElementById('sectorChart'), {
             type: 'bar',
