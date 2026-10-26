@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-10-26T22:39:52.960780+08:00",
+  "date": "20261026",
+  "market_regime": "强空",
+  "target_position": 0.1,
+  "etf_total": 0.0523,
+  "cash": 0.9477,
+  "positions": [
+    {
+      "code": "510300",
+      "name": "510300",
+      "price": 4.179,
+      "change_pct": 0.02,
+      "rsi14": 27.63,
+      "rsi6": 32.42,
+      "ma5": 4.174,
+      "ma10": 4.223,
+      "ma20": 4.348,
+      "ma60": 4.554,
+      "momentum_20": -8.8,
+      "momentum_60": -11.1,
+      "volatility_20": 0.74,
+      "volume_ratio": 1.53,
+      "relative_strength": 0.0,
+      "macd": {
+        "macd": -0.1118,
+        "signal": -0.1004,
+        "histogram": -0.0114
+      },
+      "bollinger": {
+        "middle": 4.348,
+        "upper": 4.644,
+        "lower": 4.051,
+        "width": 0.594,
+        "percent_b": 21.62
+      },
+      "atr14": 0.08,
+      "score": 56,
+      "action": "确认买",
+      "stop": 4.019,
+      "take_profit": 4.419,
+      "theme": "宽基",
+      "sector": "宽基",
+      "weight": 0.0523,
+      "intra_signal": "unknown",
+      "intra_rsi14": null,
+      "intra_macd_hist": 0
+    }
+  ],
+  "all_scanned": 30
+}
