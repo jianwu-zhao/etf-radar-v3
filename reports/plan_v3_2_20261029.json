@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-10-29T22:45:46.188836+08:00",
+  "date": "20261029",
+  "market_regime": "强空",
+  "target_position": 0.1,
+  "etf_total": 0.1,
+  "cash": 0.9,
+  "positions": [
+    {
+      "code": "515030",
+      "name": "515030",
+      "price": 1.292,
+      "change_pct": -2.42,
+      "rsi14": 32.87,
+      "rsi6": 35.47,
+      "ma5": 1.316,
+      "ma10": 1.316,
+      "ma20": 1.373,
+      "ma60": 1.52,
+      "momentum_20": -14.1,
+      "momentum_60": -19.5,
+      "volatility_20": 1.79,
+      "volume_ratio": 0.86,
+      "relative_strength": -3.66,
+      "macd": {
+        "macd": -0.0571,
+        "signal": -0.0573,
+        "histogram": 0.0001
+      },
+      "bollinger": {
+        "middle": 1.373,
+        "upper": 1.504,
+        "lower": 1.241,
+        "width": 0.263,
+        "percent_b": 19.38
+      },
+      "atr14": 0.043,
+      "score": 60,
+      "action": "可买",
+      "stop": 1.206,
+      "take_profit": 1.421,
+      "theme": "新能源链",
+      "sector": "新能源",
+      "weight": 0.1,
+      "intra_signal": "unknown",
+      "intra_rsi14": null,
+      "intra_macd_hist": 0
+    }
+  ],
+  "all_scanned": 30
+}
