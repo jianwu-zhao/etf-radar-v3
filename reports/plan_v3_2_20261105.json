@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-11-06T00:06:20.515615+08:00",
+  "date": "20261105",
+  "market_regime": "强空",
+  "target_position": 0.1,
+  "etf_total": 0.1,
+  "cash": 0.9,
+  "positions": [
+    {
+      "code": "159915",
+      "name": "创业板易方达",
+      "price": 2.584,
+      "change_pct": 0.9,
+      "rsi14": 38.21,
+      "rsi6": 49.88,
+      "ma5": 2.491,
+      "ma10": 2.556,
+      "ma20": 2.694,
+      "ma60": 3.178,
+      "momentum_20": -15.36,
+      "momentum_60": -27.42,
+      "volatility_20": 2.49,
+      "volume_ratio": 1.42,
+      "relative_strength": -10.94,
+      "macd": {
+        "macd": -0.181,
+        "signal": -0.1884,
+        "histogram": 0.0074
+      },
+      "bollinger": {
+        "middle": 2.694,
+        "upper": 3.056,
+        "lower": 2.332,
+        "width": 0.724,
+        "percent_b": 34.76
+      },
+      "atr14": 0.115,
+      "score": 53,
+      "action": "确认买",
+      "stop": 2.403,
+      "take_profit": 2.929,
+      "theme": "宽基",
+      "sector": "宽基",
+      "weight": 0.1,
+      "intra_signal": "neutral",
+      "intra_rsi14": 61.96,
+      "intra_macd_hist": -0.0053
+    }
+  ],
+  "all_scanned": 30
+}
