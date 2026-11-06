@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-11-06T23:39:14.963430+08:00",
+  "date": "20261106",
+  "market_regime": "强空",
+  "target_position": 0.1,
+  "etf_total": 0.1,
+  "cash": 0.9,
+  "positions": [
+    {
+      "code": "512760",
+      "name": "芯片国泰",
+      "price": 0.829,
+      "change_pct": -3.04,
+      "rsi14": 41.31,
+      "rsi6": 48.6,
+      "ma5": 0.813,
+      "ma10": 0.818,
+      "ma20": 0.859,
+      "ma60": 1.009,
+      "momentum_20": -14.54,
+      "momentum_60": -26.38,
+      "volatility_20": 3.1,
+      "volume_ratio": 1.5,
+      "relative_strength": -8.58,
+      "macd": {
+        "macd": -0.052,
+        "signal": -0.0571,
+        "histogram": 0.0051
+      },
+      "bollinger": {
+        "middle": 0.859,
+        "upper": 0.96,
+        "lower": 0.758,
+        "width": 0.202,
+        "percent_b": 35.16
+      },
+      "atr14": 0.046,
+      "score": 58,
+      "action": "可买",
+      "stop": 0.771,
+      "take_profit": 0.967,
+      "theme": "其他",
+      "sector": "芯片",
+      "weight": 0.1,
+      "intra_signal": "neutral",
+      "intra_rsi14": 46.74,
+      "intra_macd_hist": -0.002
+    }
+  ],
+  "all_scanned": 30
+}
