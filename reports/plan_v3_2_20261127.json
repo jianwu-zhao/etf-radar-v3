@@ -1,0 +1,91 @@
+{
+  "generated_at": "2026-11-28T01:56:32.412033+08:00",
+  "date": "20261127",
+  "market_regime": "强空",
+  "target_position": 0.1,
+  "etf_total": 0.1,
+  "cash": 0.9,
+  "positions": [
+    {
+      "code": "518880",
+      "name": "黄金华安",
+      "price": 7.441,
+      "change_pct": 2.35,
+      "rsi14": 36.4,
+      "rsi6": 42.72,
+      "ma5": 7.333,
+      "ma10": 7.502,
+      "ma20": 7.848,
+      "ma60": 8.423,
+      "momentum_20": -8.31,
+      "momentum_60": -21.23,
+      "volatility_20": 1.77,
+      "volume_ratio": 1.37,
+      "relative_strength": -10.69,
+      "macd": {
+        "macd": -0.2935,
+        "signal": -0.2488,
+        "histogram": -0.0447
+      },
+      "bollinger": {
+        "middle": 7.848,
+        "upper": 8.657,
+        "lower": 7.038,
+        "width": 1.62,
+        "percent_b": 24.9
+      },
+      "atr14": 0.176,
+      "score": 51,
+      "action": "确认买",
+      "stop": 7.089,
+      "take_profit": 7.969,
+      "theme": "黄金",
+      "sector": "黄金",
+      "weight": 0.05,
+      "intra_signal": "neutral",
+      "intra_rsi14": 67.33,
+      "intra_macd_hist": 0.0048
+    },
+    {
+      "code": "159980",
+      "name": "有色大成",
+      "price": 1.906,
+      "change_pct": 4.21,
+      "rsi14": 37.81,
+      "rsi6": 48.51,
+      "ma5": 1.86,
+      "ma10": 1.904,
+      "ma20": 1.981,
+      "ma60": 2.09,
+      "momentum_20": -9.24,
+      "momentum_60": -11.35,
+      "volatility_20": 1.27,
+      "volume_ratio": 1.63,
+      "relative_strength": -11.62,
+      "macd": {
+        "macd": -0.0662,
+        "signal": -0.0545,
+        "histogram": -0.0116
+      },
+      "bollinger": {
+        "middle": 1.981,
+        "upper": 2.159,
+        "lower": 1.803,
+        "width": 0.356,
+        "percent_b": 29.0
+      },
+      "atr14": 0.044,
+      "score": 51,
+      "action": "确认买",
+      "stop": 1.818,
+      "take_profit": 2.038,
+      "theme": "有色商品",
+      "sector": "有色",
+      "weight": 0.05,
+      "intra_signal": "neutral",
+      "intra_rsi14": 68.65,
+      "intra_macd_hist": 0.0016
+    }
+  ],
+  "all_scanned": 30
+}
